@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -29,10 +30,18 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $token = "";
+        if($user){
+            $user = User::find($request->user()['id']);
+            $user->tokens()->delete();
+            $token = $user->createToken('Access Token')->plainTextToken;
+        }
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
+                'apiToken' => $token
             ],
         ];
     }
