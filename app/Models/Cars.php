@@ -35,7 +35,7 @@ class Cars extends Model
     }
 
     public function getOriginAttribute($origin){
-        return ucwords($origin);
+        return strtoupper($origin);
     }
 
     public function setOriginAttribute($origin)
