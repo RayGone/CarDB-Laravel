@@ -15,10 +15,10 @@ class CarsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $cars = $this->carsRepository->query();
+        $query = $request->all();
+        $cars = $this->carsRepository->query($query);
         return response()->json($cars);
     }
 
