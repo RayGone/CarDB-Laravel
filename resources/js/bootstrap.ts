@@ -5,10 +5,27 @@
  */
 
 import axios from 'axios';
+
 window.axios = axios;
+
+window.axios = axios.create({
+                                baseURL: import.meta.env.APP_URL, // Replace with your API base URL
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                }
+                            });
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
+// window.axios.interceptors.response.use(
+//     response => {
+//         // Transform the response to only return the data
+//         return response.data as any;
+//     },
+//     error => {
+//         // Handle any errors
+//         return Promise.reject(error);
+//     });
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting
