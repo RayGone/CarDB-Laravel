@@ -9,7 +9,8 @@ class CarsSeeder extends Seeder
 {
     public function run()
     {
-        $file = file_get_contents(__DIR__."/../../data.json");
+        // $file = file_get_contents(__DIR__."/../../data.json");
+        $file = file_get_contents(base_path(env('DEMO_DATA_JSON_PATH', '/')));
         $json = json_decode($file);
 
         foreach($json as $car){
