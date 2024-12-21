@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase; //Don't use Refresh Database on Production, it wipes out all the data.
 use Tests\TestCase;
 
 /*
@@ -14,7 +15,7 @@ use Tests\TestCase;
 |
 */
 
-uses(TestCase::class, RefreshDatabase::class)->in('Feature');
+uses(TestCase::class, DatabaseTransactions::class)->in('Feature');
 
 /*
 |--------------------------------------------------------------------------
