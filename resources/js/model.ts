@@ -1,4 +1,4 @@
-import { Column, OP, CarResponse, DataFilterModel } from "@/types";
+import { Column, OP, CarResponse, DataFilterModel, FilterModel } from "@/types";
 
 export const columnDef: Column[] = [
   {
@@ -93,6 +93,12 @@ export const initFilter: DataFilterModel = {
     orderBy: 'id',
     search: '',
     page: 0,
+}
+
+export const initOps: FilterModel = {
+    field: '-1',
+    ops: '-1',
+    value: '0'
 }
 
 export const setFilter = (filter: DataFilterModel) => {

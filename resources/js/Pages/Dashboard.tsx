@@ -3,7 +3,11 @@ import { Head } from '@inertiajs/react';
 import { CarResponse, DataFilterModel, PageProps } from '@/types';
 import Table from '@/Components/Table';
 import { useEffect, useRef, useState } from 'react';
-import {emptyCarResponse, getFilter, setFilter} from "@/model";
+import {emptyCarResponse, getFilter, setFilter, filterAttributes, filterOps} from "@/model";
+import ActionButton from '@/Components/ActionButton';
+import FilterView from '@/Components/FilterView';
+import Modal from '@/Components/Modal';
+import PrimaryButton from '@/Components/PrimaryButton';
 
 export default function Dashboard({ auth }: PageProps) {
     const [cars, setCars] = useState<CarResponse>(emptyCarResponse);
@@ -60,13 +64,29 @@ export default function Dashboard({ auth }: PageProps) {
                             {/* <PrimaryButton>Call Another API</PrimaryButton> */}
                         </div>
                     </div>
-                    <div className='hidden lg:block box-border sticky-head h-fit'>
-                        <div className="bg-white shadow-sm sm:rounded-lg sm:px-2 lg:px-3 ">
-                            Filter Section
-                        </div>
+                    <div className='hidden lg:block box-border sticky-head h-fit mr-2'>
+                        <FilterView
+                            model={pageFilter.filter}
+                            onFilter={(f)=>{
+                                pageFilter.filter.push(f);
+                                setFilter(pageFilter);
+                                setPageFilter(getFilter());
+                            }}
+
+                            onRemove={(f)=>{
+                                console.log("Before",pageFilter.filter)
+                                pageFilter.filter = pageFilter.filter.filter((r)=> !(r.field==f.field && r.ops==f.ops && r.value==f.value));
+                                console.log("OnRemove", {f}, pageFilter.filter)
+                                setFilter(pageFilter);
+                                setPageFilter(getFilter());
+                            }}
+                        >
+                            <span className='p-2 text-l'>No Filter Set.</span>
+                        </FilterView>
                     </div>
                 </div>
             </div>
+
         </AuthenticatedLayout>
     );
 }

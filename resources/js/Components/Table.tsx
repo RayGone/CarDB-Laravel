@@ -15,7 +15,6 @@ export default function Table({data, onFilter, onEdit, onDelete}: TableComponent
     const from = f.current.page*f.current.limit
     const to = from+data.cars.length
     const maxPage = Math.ceil(data.total/f.current.limit)
-    console.log(data)
 
     return (
         <>
