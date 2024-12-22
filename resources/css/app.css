@@ -1,3 +1,40 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+.sticky-head{
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index:1001;
+}
+
+.sticky-right{
+    position: -webkit-sticky;
+    position: sticky;
+    right:0;
+    z-index:10;
+    box-shadow: "-1px 0 2px gray"
+}
+
+
+.sticky-foot{
+    position: -webkit-sticky;
+    position: sticky;
+    bottom: 0;
+    z-index:1001;
+}
+
+.shadow-up{
+    box-shadow: 0 -1px 5px #cccccc99;
+}
+
+.shadow-down{
+    box-shadow: 0 2px 5px #cccccc88;
+}
+
+.shadow-left{
+    box-shadow: -3px 0px 5px #cccccc;
+}

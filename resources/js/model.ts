@@ -94,3 +94,14 @@ export const initFilter: DataFilterModel = {
     search: '',
     page: 0,
 }
+
+export const setFilter = (filter: DataFilterModel) => {
+    localStorage.setItem("filter", JSON.stringify(filter));
+}
+
+export const getFilter = () => {
+    const fs = localStorage.getItem('filter')
+    if(fs)
+        return JSON.parse(fs)
+    return initFilter
+}
