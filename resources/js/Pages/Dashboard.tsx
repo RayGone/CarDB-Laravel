@@ -12,9 +12,11 @@ import PrimaryButton from '@/Components/PrimaryButton';
 export default function Dashboard({ auth }: PageProps) {
     const [cars, setCars] = useState<CarResponse>(emptyCarResponse);
     const [pageFilter, setPageFilter] = useState<DataFilterModel>(getFilter());
+    const [loading, setLoading] = useState<boolean>(false);
 
     const abortController = useRef<any>({control: null});
     useEffect(() => {
+        setLoading(true);
         if (abortController.current.control) {
             abortController.current.control.abort();
         }
@@ -30,13 +32,13 @@ export default function Dashboard({ auth }: PageProps) {
             if(res.data.status == 'success'){
                 const response: CarResponse = res.data.data;
                 setCars(response);
+                setLoading(false);
             }
         }).catch((err) => {
             // console.log({err})
+            setLoading(false)
         });
     },[pageFilter]);
-
-    console.log("Dashboard", {pageFilter})
 
     return (
         <AuthenticatedLayout
@@ -57,7 +59,9 @@ export default function Dashboard({ auth }: PageProps) {
                                         setPageFilter(f)
                                     }}
                                     onDelete={(id: number)=>{console.log("Delete",id)}}
-                                    onEdit={(id: number)=>{console.log("Edit",id)}}/>
+                                    onEdit={(id: number)=>{console.log("Edit",id)}}
+                                    loading={loading}
+                                    />
                             </div>
                             {/* <div className="p-6 text-gray-900">You're logged in!</div> */}
                             {/* <button className="bg-blue-500 hover:bg-blue-700 active:bg-blue-600 text-white font-bold py-2 px-4 rounded"> Call API </button> */}
