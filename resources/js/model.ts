@@ -1,4 +1,4 @@
-import { Column, OP, CarResponse, DataFilterModel } from "@/types";
+import { Column, OP, CarResponse, DataFilterModel, FilterModel, Car } from "@/types";
 
 export const columnDef: Column[] = [
   {
@@ -81,6 +81,18 @@ export const filterOps: OP[] = [
   },
 ];
 
+export const emptyCar: Car = {
+    name: "",
+    origin: "",
+    model_year: -1,
+    acceleration: undefined,
+    horsepower: undefined,
+    mpg: undefined,
+    weight: undefined,
+    cylinders: undefined,
+    displacement: undefined
+};
+
 export const emptyCarResponse: CarResponse = {
     cars: [],
     total: 0
@@ -93,4 +105,21 @@ export const initFilter: DataFilterModel = {
     orderBy: 'id',
     search: '',
     page: 0,
+}
+
+export const initOps: FilterModel = {
+    field: '-1',
+    ops: '-1',
+    value: '0'
+}
+
+export const setFilter = (filter: DataFilterModel) => {
+    localStorage.setItem("filter", JSON.stringify(filter));
+}
+
+export const getFilter = () => {
+    const fs = localStorage.getItem('filter')
+    if(fs)
+        return JSON.parse(fs)
+    return initFilter
 }

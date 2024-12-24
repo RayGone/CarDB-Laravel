@@ -13,16 +13,16 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
 };
 
 export interface Car {
-    id: number;
+    id?: number;
     name: string;
     origin: string;
     model_year: number;
-    acceleration: number;
-    horsepower: number;
-    mpg: number;
-    weight: number;
-    cylinders: number;
-    displacement: number;
+    acceleration?: number;
+    horsepower?: number;
+    mpg?: number;
+    weight?: number;
+    cylinders?: number;
+    displacement?: number;
   }
 
   export interface CarResponse {
