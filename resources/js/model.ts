@@ -1,4 +1,4 @@
-import { Column, OP, CarResponse, DataFilterModel, FilterModel } from "@/types";
+import { Column, OP, CarResponse, DataFilterModel, FilterModel, Car } from "@/types";
 
 export const columnDef: Column[] = [
   {
@@ -80,6 +80,18 @@ export const filterOps: OP[] = [
     value: 'Less Than or Equals'
   },
 ];
+
+export const emptyCar: Car = {
+    name: "",
+    origin: "",
+    model_year: -1,
+    acceleration: undefined,
+    horsepower: undefined,
+    mpg: undefined,
+    weight: undefined,
+    cylinders: undefined,
+    displacement: undefined
+};
 
 export const emptyCarResponse: CarResponse = {
     cars: [],

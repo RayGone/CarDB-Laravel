@@ -11,16 +11,17 @@ import ActionButton from '@/Components/ActionButton';
 import Dropdown from '@/Components/Dropdown';
 import SearchBox from '@/Components/Searchbox';
 import Modal from '@/Components/Modal';
+import FormCar from '@/Components/FormCar';
 
 
-function DashboardHeader({onSearch, onAdd, onOpenFilter=()=>{}}: {onSearch?: (s: string)=>void, onAdd?: ()=>void, onOpenFilter?: ()=>void}){
+function DashboardHeader({onSearch, onAdd=()=>{}, onOpenFilter=()=>{}}: {onSearch?: (s: string)=>void, onAdd?: ()=>void, onOpenFilter?: ()=>void}){
     const f = getFilter();
     return <>
         <h2 className="font-semibold text-xl text-gray-800 leading-tight"><span className='hidden md:block'>Dashboard</span></h2>
 
         <div className='flex flex-row items-center justify-end'>
             <SearchBox onSearch={onSearch} value={f.search}/>
-            <div className='mr-2'>
+            <div className='mr-2' onClick={()=>onAdd()}>
                 <SecondaryButton className='hidden md:block'>Add Car</SecondaryButton>
                 <ActionButton className='block md:hidden' title='Add Car'>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4 md:size-5">
@@ -63,10 +64,12 @@ export default function Dashboard({ auth }: PageProps) {
     const [pageFilter, setPageFilter] = useState<DataFilterModel>(getFilter());
     const [loading, setLoading] = useState<boolean>(false);
     const [isFilter, setIsFilter] = useState<boolean>(false);
+    const [openForm, setOpenForm] = useState<boolean>(false);
 
     const delayRef = useRef<any>(null);
-
     const abortController = useRef<any>({control: null});
+    const editCar = useRef<any>(null);
+
     useEffect(() => {
         setLoading(true);
         if (abortController.current.control) {
@@ -75,7 +78,7 @@ export default function Dashboard({ auth }: PageProps) {
 
         abortController.current.control = new AbortController();
 
-        window.axios.post("/api/cars/filterSearch",pageFilter, {
+        window.axios.post(route('api.cars.getbyfilter'),pageFilter, {
             headers:{
                 Authorization: `Bearer ${auth.apiToken}`
             },
@@ -115,12 +118,13 @@ export default function Dashboard({ auth }: PageProps) {
                         applyFilter(f)
                     }}
 
+                    onAdd={()=>{setOpenForm(true);}}
+
                     onOpenFilter={()=>{
                         setIsFilter(true);
                     }}
 
-                    />
-                }
+                />}
         >
             <Head title="Dashboard" />
 
@@ -132,7 +136,13 @@ export default function Dashboard({ auth }: PageProps) {
                                 <Table data={cars}
                                     onFilter={applyFilter}
                                     onDelete={(id: number)=>{console.log("Delete",id)}}
-                                    onEdit={(id: number)=>{console.log("Edit",id)}}
+                                    onEdit={(id: number)=>{
+                                        const car = cars.cars.filter((c) => c.id == id);
+                                        if(car.length > 0){
+                                            editCar.current = car[0];
+                                        }
+                                        setOpenForm(true);
+                                    }}
                                     loading={loading}
                                     />
                             </div>
@@ -158,25 +168,36 @@ export default function Dashboard({ auth }: PageProps) {
                         </FilterView>
                     </div>
                 </div>
-
-                {isFilter &&
-                    <Modal show={isFilter} maxWidth='sm' onClose={()=>{setIsFilter(false)}}>
-                        <FilterView
-                            model={pageFilter.filter}
-                            onFilter={(f)=>{
-                                pageFilter.filter.push(f);
-                                applyFilter(pageFilter);
-                            }}
-
-                            onRemove={(f)=>{
-                                pageFilter.filter = pageFilter.filter.filter((r)=> !(r.field==f.field && r.ops==f.ops && r.value==f.value));
-                                applyFilter(pageFilter)
-                            }}
-                        >
-                            <span className='p-2 text-l'>No Filter Set.</span>
-                        </FilterView>
-                    </Modal>}
             </div>
+
+            {isFilter &&
+                <Modal show={isFilter} maxWidth='sm' onClose={()=>{setIsFilter(false)}}>
+                    <FilterView
+                        model={pageFilter.filter}
+                        onFilter={(f)=>{
+                            pageFilter.filter.push(f);
+                            applyFilter(pageFilter);
+                        }}
+
+                        onRemove={(f)=>{
+                            pageFilter.filter = pageFilter.filter.filter((r)=> !(r.field==f.field && r.ops==f.ops && r.value==f.value));
+                            applyFilter(pageFilter)
+                        }}
+                    >
+                        <span className='p-2 text-l'>No Filter Set.</span>
+                    </FilterView>
+                </Modal>}
+
+            <Modal show={openForm} maxWidth='md' onClose={()=>{setOpenForm(false);}}>
+                <div style={{height: '80vh'}} className="overflow-auto">
+                    <FormCar
+                        car={editCar.current}
+                        onCancel={()=>{
+                            setOpenForm(false);
+                            editCar.current = null;
+                        }}/>
+                </div>
+            </Modal>
         </AuthenticatedLayout>
     );
 }
