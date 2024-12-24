@@ -106,7 +106,7 @@ export default function FilterView(
 
     const [openAddFilter, setOpenAddFilter] = useState<boolean>(true);
 
-    return <div className={"bg-white shadow-sm sm:rounded-lg p-2 flex flex-col " + className} {...props}>
+    return <div className={"bg-white shadow-sm sm:rounded-lg p-2 flex flex-col min-w-64 " + className} {...props}>
         <div className='inline-flex items-center justify-between p-2 w-full'>
             <span className='title font-bold text-xl'>Filters</span>
             <ActionButton className='active:bg-transparent' onClick={()=>{setOpenAddFilter(true)}}>
