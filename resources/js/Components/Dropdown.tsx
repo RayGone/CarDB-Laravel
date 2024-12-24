@@ -92,8 +92,21 @@ const DropdownLink = ({ className = '', children, ...props }: InertiaLinkProps) 
     );
 };
 
+const DropdownAnchor = ({className = '', href='', target="_blank", children}: PropsWithChildren<{className?: string, href: string, target?:string}>) => {
+    return (<a
+            href={href}
+            target="_blank"
+            className={`block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 hover:bg-gray-100
+                    focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out ${className}`}
+            >
+                    {children}
+            </a>);
+
+}
+
 Dropdown.Trigger = Trigger;
 Dropdown.Content = Content;
 Dropdown.Link = DropdownLink;
+Dropdown.Anchor = DropdownAnchor;
 
 export default Dropdown;

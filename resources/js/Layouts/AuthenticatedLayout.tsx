@@ -12,7 +12,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
     return (
         <div className="min-h-screen bg-gray-100">
             <nav className="bg-white border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
                         <div className="flex">
                             <div className="shrink-0 flex items-center">
@@ -118,11 +118,15 @@ export default function Authenticated({ user, header, children }: PropsWithChild
 
             {header && (
                 <header className="bg-white shadow">
-                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
+                    <div className="max-w-full mx-auto py-2 px-4 sm:px-6 lg:px-8">
+                        <div className='flex justify-between items-center'>
+                            {header}
+                        </div>
+                    </div>
                 </header>
             )}
 
-            <main>{children}</main>
+            <main className='overflow-hidden' style={{maxHeight: '90vh'}}>{children}</main>
         </div>
     );
 }

@@ -3,16 +3,59 @@ import { Head } from '@inertiajs/react';
 import { CarResponse, DataFilterModel, PageProps } from '@/types';
 import Table from '@/Components/Table';
 import { useEffect, useRef, useState } from 'react';
-import {emptyCarResponse, getFilter, setFilter, filterAttributes, filterOps} from "@/model";
-import ActionButton from '@/Components/ActionButton';
+import {emptyCarResponse, getFilter, setFilter} from "@/model";
 import FilterView from '@/Components/FilterView';
-import Modal from '@/Components/Modal';
-import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
+import SecondaryButton from '@/Components/SecondaryButton';
+import ActionButton from '@/Components/ActionButton';
+import Dropdown from '@/Components/Dropdown';
+import SearchBox from '@/Components/Searchbox';
+
+
+function DashboardHeader({onSearch, onAdd}: {onSearch?: (s: string)=>void, onAdd?: ()=>void}){
+    const f = getFilter();
+    return <>
+        <h2 className="font-semibold text-xl text-gray-800 leading-tight"><span className='hidden md:block'>Dashboard</span></h2>
+
+        <div className='flex flex-row items-center justify-end'>
+            <SearchBox onSearch={onSearch} value={f.search}/>
+            <div className='mr-2'>
+                <SecondaryButton className='hidden md:block'>Add Car</SecondaryButton>
+                <ActionButton className='block md:hidden' title='Add Car'>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4 md:size-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                </ActionButton>
+            </div>
+            <div className="mr-2 relative">
+                <Dropdown>
+                    <Dropdown.Trigger>
+                        <SecondaryButton className='hidden md:block'>Download</SecondaryButton>
+                        <ActionButton title="Download Data" className='block md:hidden'>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4 md:size-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                            </svg>
+                        </ActionButton>
+                    </Dropdown.Trigger>
+
+                    <Dropdown.Content>
+                        <Dropdown.Anchor href={route('api.cars.download',{"type":"csv"})}>CSV</Dropdown.Anchor>
+                        <hr />
+                        <Dropdown.Anchor href={route('api.cars.download',{"type":"json"})}>JSON</Dropdown.Anchor>
+                    </Dropdown.Content>
+                </Dropdown>
+            </div>
+
+        </div>
+
+    </>;
+}
 
 export default function Dashboard({ auth }: PageProps) {
     const [cars, setCars] = useState<CarResponse>(emptyCarResponse);
     const [pageFilter, setPageFilter] = useState<DataFilterModel>(getFilter());
     const [loading, setLoading] = useState<boolean>(false);
+    const delayRef = useRef<any>(null);
 
     const abortController = useRef<any>({control: null});
     useEffect(() => {
@@ -40,10 +83,29 @@ export default function Dashboard({ auth }: PageProps) {
         });
     },[pageFilter]);
 
+    function applyFilter(f: DataFilterModel){
+        if(delayRef.current) clearTimeout(delayRef.current);
+
+        setFilter(f);
+        f = getFilter();
+        delayRef.current = setTimeout(()=>{
+            setPageFilter(f);
+        }, 200);
+    }
+
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>}
+            header={
+                <DashboardHeader
+                    onSearch={(s)=>{
+                        const f = {
+                            ...pageFilter,
+                            search: s
+                        };
+                        applyFilter(f)
+                    }} />
+                }
         >
             <Head title="Dashboard" />
 
@@ -53,11 +115,7 @@ export default function Dashboard({ auth }: PageProps) {
                         <div className="shadow rounded-lg relative">
                             <div className='overflow-auto max-h-[75vh]'>
                                 <Table data={cars}
-                                    onFilter={(f: DataFilterModel)=>{
-                                        setFilter(f)
-                                        f = getFilter()
-                                        setPageFilter(f)
-                                    }}
+                                    onFilter={applyFilter}
                                     onDelete={(id: number)=>{console.log("Delete",id)}}
                                     onEdit={(id: number)=>{console.log("Edit",id)}}
                                     loading={loading}
@@ -73,16 +131,12 @@ export default function Dashboard({ auth }: PageProps) {
                             model={pageFilter.filter}
                             onFilter={(f)=>{
                                 pageFilter.filter.push(f);
-                                setFilter(pageFilter);
-                                setPageFilter(getFilter());
+                                applyFilter(pageFilter);
                             }}
 
                             onRemove={(f)=>{
-                                console.log("Before",pageFilter.filter)
                                 pageFilter.filter = pageFilter.filter.filter((r)=> !(r.field==f.field && r.ops==f.ops && r.value==f.value));
-                                console.log("OnRemove", {f}, pageFilter.filter)
-                                setFilter(pageFilter);
-                                setPageFilter(getFilter());
+                                applyFilter(pageFilter)
                             }}
                         >
                             <span className='p-2 text-l'>No Filter Set.</span>
