@@ -44,7 +44,9 @@ export default function Modal({
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="absolute inset-0 bg-gray-500/75" />
+                    <div className="absolute inset-0 bg-gray-500/75">
+                        <span className='float-right text-lg m-2 py-1 px-5 font-bolder cursor-pointer text-red-300 border rounded'>x</span>
+                    </div>
                 </Transition.Child>
 
                 <Transition.Child
@@ -57,7 +59,7 @@ export default function Modal({
                     leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 >
                     <Dialog.Panel
-                        className={`mb-6 bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto ${maxWidthClass}`}
+                        className={`mb-6 bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full mx-auto ${maxWidthClass}`}
                     >
                         {children}
                     </Dialog.Panel>

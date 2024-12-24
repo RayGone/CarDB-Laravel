@@ -10,9 +10,10 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import ActionButton from '@/Components/ActionButton';
 import Dropdown from '@/Components/Dropdown';
 import SearchBox from '@/Components/Searchbox';
+import Modal from '@/Components/Modal';
 
 
-function DashboardHeader({onSearch, onAdd}: {onSearch?: (s: string)=>void, onAdd?: ()=>void}){
+function DashboardHeader({onSearch, onAdd, onOpenFilter=()=>{}}: {onSearch?: (s: string)=>void, onAdd?: ()=>void, onOpenFilter?: ()=>void}){
     const f = getFilter();
     return <>
         <h2 className="font-semibold text-xl text-gray-800 leading-tight"><span className='hidden md:block'>Dashboard</span></h2>
@@ -46,6 +47,12 @@ function DashboardHeader({onSearch, onAdd}: {onSearch?: (s: string)=>void, onAdd
                 </Dropdown>
             </div>
 
+            <ActionButton onClick={()=>onOpenFilter()} className='block lg:hidden' title={"Filters"}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4 md:size-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
+                </svg>
+            </ActionButton>
+
         </div>
 
     </>;
@@ -55,6 +62,8 @@ export default function Dashboard({ auth }: PageProps) {
     const [cars, setCars] = useState<CarResponse>(emptyCarResponse);
     const [pageFilter, setPageFilter] = useState<DataFilterModel>(getFilter());
     const [loading, setLoading] = useState<boolean>(false);
+    const [isFilter, setIsFilter] = useState<boolean>(false);
+
     const delayRef = useRef<any>(null);
 
     const abortController = useRef<any>({control: null});
@@ -104,7 +113,13 @@ export default function Dashboard({ auth }: PageProps) {
                             search: s
                         };
                         applyFilter(f)
-                    }} />
+                    }}
+
+                    onOpenFilter={()=>{
+                        setIsFilter(true);
+                    }}
+
+                    />
                 }
         >
             <Head title="Dashboard" />
@@ -143,8 +158,25 @@ export default function Dashboard({ auth }: PageProps) {
                         </FilterView>
                     </div>
                 </div>
-            </div>
 
+                {isFilter &&
+                    <Modal show={isFilter} maxWidth='sm' onClose={()=>{setIsFilter(false)}}>
+                        <FilterView
+                            model={pageFilter.filter}
+                            onFilter={(f)=>{
+                                pageFilter.filter.push(f);
+                                applyFilter(pageFilter);
+                            }}
+
+                            onRemove={(f)=>{
+                                pageFilter.filter = pageFilter.filter.filter((r)=> !(r.field==f.field && r.ops==f.ops && r.value==f.value));
+                                applyFilter(pageFilter)
+                            }}
+                        >
+                            <span className='p-2 text-l'>No Filter Set.</span>
+                        </FilterView>
+                    </Modal>}
+            </div>
         </AuthenticatedLayout>
     );
 }

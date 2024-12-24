@@ -94,8 +94,8 @@ export default function Table({data, onFilter, onEdit, onDelete, loading=false}:
                                                 <option value={100} className='text-xs md:text-sm'>100</option>
                                         </select>
                                     </div>
-                                    <div className='px-3 font-light mb-1'>Showing: {from} to {to} of {data.total}</div>
                                     <div className='float-right lg:float-clear mb-1'>
+                                        &nbsp;&nbsp; Showing: {from} to {to} of {data.total} &nbsp;&nbsp;
                                         <ul className="inline-flex items-center -space-x-px">
                                             <li>
                                                 <a href="#"
