@@ -20,13 +20,13 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     })->name("api.user");
 
-    Route::group([], function(){
-        Route::get('/cars', [CarsController::class, 'index'])->name("api.cars.getbyquery");
-        Route::post('/cars/filterSearch', [CarsController::class, 'index'])->name("api.cars.getbyfilter");
-        Route::get('/cars/{id}', [CarsController::class, 'show'])->name("api.cars.getbyid");
-        Route::post('/cars', [CarsController::class, 'store'])->name("api.cars.add");
-        Route::put('/cars/{id}', [CarsController::class, 'update'])->name("api.cars.edit");
-        Route::delete('/cars/{id}', [CarsController::class, 'destroy'])->name("api.cars.delete");
-        Route::get('/cars/download', [CarsController::class, 'destroy'])->name("api.cars.download");
+    Route::group(['prefix'=>"cars"], function(){
+        Route::get('/', [CarsController::class, 'index'])->name("api.cars.getbyquery");
+        Route::post('/filterSearch', [CarsController::class, 'index'])->name("api.cars.getbyfilter");
+        Route::get('/{id}', [CarsController::class, 'show'])->name("api.cars.getbyid");
+        Route::post('/', [CarsController::class, 'store'])->name("api.cars.add");
+        Route::put('/{id}', [CarsController::class, 'update'])->name("api.cars.edit");
+        Route::delete('/{id}', [CarsController::class, 'destroy'])->name("api.cars.delete");
+        Route::get('/download/{type}', [CarsController::class, 'download'])->name("api.cars.download")->withoutMiddleware('auth:sanctum');
     });
 });

@@ -6,7 +6,10 @@ use Illuminate\Support\Facades\Log;
 
 use App\Repositories\CarsRepository;
 use Exception;
+use RuntimeException;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CarsExport;
 
 class CarsController extends Controller
 {
@@ -66,5 +69,28 @@ class CarsController extends Controller
     public function destroy(Cars $cars)
     {
         //
+    }
+
+    /**
+     * Download all as file
+     */
+    public function download(string $type){
+        $accept = ['csv', 'json'];
+        $fname = "cars.".$type;
+        if(in_array($type, $accept)){
+            if($type == "csv"){
+                return Excel::download(new CarsExport, $fname);
+            }else{
+                $export = new CarsExport();
+                $content = $export->toJson();
+                $content_type = "application/json";
+                return response()->streamDownload(function () use ($content) {
+                    echo $content;
+                }, $fname, ['Content-Type'=>$content_type]);
+            }
+
+        }else{
+            throw new RuntimeException("Unrecognized / Unacceptable File Type!!");
+        }
     }
 }
