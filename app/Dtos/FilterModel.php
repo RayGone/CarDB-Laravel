@@ -4,6 +4,7 @@ namespace App\Dtos;
 
 use App\Enums\SortOrderEnum;
 use App\Enums\CarsAttributeEnum;
+use App\Dtos\ConditionDto;
 
 class FilterModel{
     public array $filters;
@@ -14,7 +15,8 @@ class FilterModel{
     public string $search;
 
     public function __construct(
-        array $filters =[], int | null $limit=5,
+        array $filters =[],
+        int | null $limit=5,
         int | null $page=0,
         string | null $order=SortOrderEnum::ASC,
         string | null $orderBy=CarsAttributeEnum::ID,
@@ -29,7 +31,15 @@ class FilterModel{
     }
 
     public static function init(array $model){
-        return new self(isset($model['filters']) ? $model['filters'] : [],
+        $filters = [];
+        if(count($model['filter']) > 0){
+            foreach($model['filter'] as $f){
+                $cf = new ConditionDto($f);
+                array_push($filters, $cf);
+            }
+        }
+
+        return new self($filters,
                         isset($model['limit']) ? $model['limit'] : null,
                         isset($model['page']) ? $model['page'] : null,
                         isset($model['order']) ? $model['order'] : null,

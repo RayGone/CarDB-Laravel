@@ -22,7 +22,7 @@ class Cars extends Model
      * @var array<string, string>
      */
     protected $casts = [
-
+        'model_year' => 'datetime:Y-m-d',
     ];
 
     public function getNameAttribute($name){
@@ -40,6 +40,6 @@ class Cars extends Model
 
     public function setOriginAttribute($origin)
     {
-        $this->attributes['name'] = mb_strtolower($origin);
+        $this->attributes['origin'] = mb_strtolower($origin);
     }
 }

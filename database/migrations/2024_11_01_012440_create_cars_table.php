@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable(false);
             $table->string('origin')->nullable(false);
-            $table->integer('model_year')->nullable(false);
+            $table->date('model_year')->nullable(false);
             $table->double('acceleration')->nullable(true);
             $table->double('horsepower')->nullable(true);
             $table->double('mpg')->nullable(true);

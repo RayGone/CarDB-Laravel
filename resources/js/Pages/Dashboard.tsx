@@ -135,7 +135,25 @@ export default function Dashboard({ auth }: PageProps) {
                             <div className='overflow-auto max-h-[75vh]'>
                                 <Table data={cars}
                                     onFilter={applyFilter}
-                                    onDelete={(id: number)=>{console.log("Delete",id)}}
+                                    onDelete={(id: number)=>{
+                                        const car = cars.cars.filter((c) => c.id == id);
+                                        if(car.length > 0){
+                                            window.axios.delete(route('api.cars.delete', {id}), {
+                                                headers:{
+                                                    Authorization: `Bearer ${auth.apiToken}`
+                                                },
+                                                data: car[0],
+                                                signal: abortController.current.control.signal
+                                            }).then((res) => {
+                                                console.log(res.data);
+                                                if(res.data.status == 'success'){
+                                                    applyFilter(getFilter());
+                                                }
+                                            }).catch((err) => {
+                                                // console.log({err})
+                                            });
+                                        }
+                                    }}
                                     onEdit={(id: number)=>{
                                         const car = cars.cars.filter((c) => c.id == id);
                                         if(car.length > 0){
@@ -195,6 +213,13 @@ export default function Dashboard({ auth }: PageProps) {
                         onCancel={()=>{
                             setOpenForm(false);
                             editCar.current = null;
+                        }}
+
+                        onSubmit={()=>{
+                            setOpenForm(false);
+                            editCar.current = null
+
+                            applyFilter(getFilter());
                         }}/>
                 </div>
             </Modal>

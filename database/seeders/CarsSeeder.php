@@ -18,6 +18,7 @@ class CarsSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+            $entry['model_year'] = "19{$entry['model_year']}-01-01";
             DB::table('cars')->insert($entry);
         }
 

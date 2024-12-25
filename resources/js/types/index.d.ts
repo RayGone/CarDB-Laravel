@@ -13,10 +13,11 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
 };
 
 export interface Car {
+    [key: string]: any;
     id?: number;
     name: string;
     origin: string;
-    model_year: number;
+    model_year: Date;
     acceleration?: number;
     horsepower?: number;
     mpg?: number;
@@ -34,6 +35,7 @@ export interface Car {
     key: string;
     header: string;
     type: string;
+    required: boolean;
   }
 
   export interface OP{
