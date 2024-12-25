@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
+
 use App\Repositories\CarsRepository;
+use Exception;
 use Illuminate\Http\Request;
 
 class CarsController extends Controller
@@ -17,9 +20,20 @@ class CarsController extends Controller
      */
     public function index(Request $request)
     {
-        $query = $request->all();
-        $cars = $this->carsRepository->query($query);
-        return response()->json($cars);
+        try{
+            $query = $request->all();
+            $cars = $this->carsRepository->query($query);
+            return response()->json([
+                "status"=>"success",
+                "data"=>$cars
+            ], 200);
+        } catch(Exception $e){
+            return response()->json([
+                "status"=>"error",
+                "message"=>"Server Error: ".$e->getMessage(),
+                "data" => []
+            ], 500);
+        }
     }
 
     /**
