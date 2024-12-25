@@ -98,14 +98,19 @@ class CarsController extends Controller
 
         return response()->json([
             "status"=>"success",
-            "created"=> $car]);
+            "edited"=> $car]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id, Cars $car)
+    public function destroy(int $id, Request $request)
     {
+        $validated = $request->validate($this->rule);
+
+        $car = $this->carsRepository->deleteCar($validated, $id);
+
+        return response()->json(["deleted"=>$car, "status"=>"success"]);
 
     }
 

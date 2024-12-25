@@ -10,7 +10,8 @@ use App\Enums\CarsAttributeEnum;
 class CarsRepository{
     public function __construct(){}
 
-    public function query(array $filterModel){
+    public function query(array $filterModel)
+    {
         $filterModel = FilterModel::init($filterModel);
 
         $query = Cars::orderBy($filterModel->orderBy->value, $filterModel->order->value);
@@ -45,11 +46,13 @@ class CarsRepository{
         // ];
     }
 
-    public function queryOne(int $id){
+    public function queryOne(int $id)
+    {
         return Cars::find($id);
     }
 
-    public function addCar(array $car){
+    public function addCar(array $car)
+    {
         $dto = (new CarDto($car))->toArray();
         $oldCar = Cars::where("name",$dto['name'])->where("origin",$dto['origin'])->where("model_year",$dto['model_year'])->get();
         if(count($oldCar))
@@ -62,7 +65,8 @@ class CarsRepository{
         return $newCar;
     }
 
-    public function editCar(array $car, int $id){
+    public function editCar(array $car, int $id)
+    {
         $dto = (new CarDto($car))->toArray();
         $cars = Cars::findOrFail($id);
 
@@ -70,6 +74,18 @@ class CarsRepository{
         $cars->fill($dto);
         $cars->save();
         return $cars;
+    }
+
+    public function deleteCar(array $car, int $id)
+    {
+        $dbCar = Cars::findOrFail($id);
+        $dto1 = (new CarDto($dbCar->toArray()))->toArray();
+        $dto2 = (new CarDto($car))->toArray();
+
+        if(json_encode($dto1) == json_encode($dto2))
+            $dbCar->delete();
+
+        return $dto1;
     }
 }
 ?>
