@@ -22,7 +22,7 @@ class Cars extends Model
      * @var array<string, string>
      */
     protected $casts = [
-
+        'model_year' => 'datetime:Y-m-d',
     ];
 
     public function getNameAttribute($name){

@@ -17,7 +17,7 @@ export interface Car {
     id?: number;
     name: string;
     origin: string;
-    model_year: number;
+    model_year: Date;
     acceleration?: number;
     horsepower?: number;
     mpg?: number;
