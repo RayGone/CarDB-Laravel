@@ -61,5 +61,15 @@ class CarsRepository{
         $newCar = Cars::create($dto);
         return $newCar;
     }
+
+    public function editCar(array $car, int $id){
+        $dto = (new CarDto($car))->toArray();
+        $cars = Cars::findOrFail($id);
+
+        unset($dto['id']);
+        $cars->fill($dto);
+        $cars->save();
+        return $cars;
+    }
 }
 ?>

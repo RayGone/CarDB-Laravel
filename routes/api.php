@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/filterSearch', [CarsController::class, 'index'])->name("api.cars.getbyfilter");
         Route::get('/{id}', [CarsController::class, 'show'])->name("api.cars.getbyid");
         Route::post('/', [CarsController::class, 'store'])->name("api.cars.add");
-        Route::put('/{id}', [CarsController::class, 'update'])->name("api.cars.edit");
+        Route::patch('/{id}', [CarsController::class, 'update'])->name("api.cars.edit");
         Route::delete('/{id}', [CarsController::class, 'destroy'])->name("api.cars.delete");
         Route::get('/download/{type}', [CarsController::class, 'download'])->name("api.cars.download")->withoutMiddleware('auth:sanctum');
     });

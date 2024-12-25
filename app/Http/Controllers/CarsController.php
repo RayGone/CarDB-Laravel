@@ -86,12 +86,19 @@ class CarsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(int $id, Request $request)
     {
         $validated = $request->validate($this->rule);
+
+        if($id != $validated['id']){
+            throw new RuntimeException("Car doesn't Exist.");
+        }
+
+        $car = $this->carsRepository->editCar($validated, $id);
+
         return response()->json([
             "status"=>"success",
-            "created"=> $validated]);
+            "created"=> $car]);
     }
 
     /**
