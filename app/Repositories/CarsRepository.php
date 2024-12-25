@@ -44,5 +44,9 @@ class CarsRepository{
         //     "total" => $paginate->total()
         // ];
     }
+
+    public function queryOne(int $id){
+        return Cars::find($id);
+    }
 }
 ?>

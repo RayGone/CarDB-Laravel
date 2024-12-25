@@ -50,9 +50,19 @@ class CarsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Cars $cars)
+    public function show(int $id)
     {
-        //
+        $car = $this->carsRepository->queryOne($id);
+        if($car)
+            return response()->json([
+                "status" => "success",
+                "data" => $car
+            ], 200);
+        else
+            return response()->json([
+                "status" => "not-found",
+                "data" => $car
+            ], 404);
     }
 
     /**
