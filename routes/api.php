@@ -18,12 +18,15 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
-    });
+    })->name("api.user");
 
-    Route::get('/cars', [CarsController::class, 'index'])->name("Fetch Cars with GET");
-    Route::post('/cars/filterSearch', [CarsController::class, 'index'])->name("Fetch Cars with POST");
-    Route::get('/cars/{id}', [CarsController::class, 'show'])->name("Get Car By ID");
-    Route::post('/cars', [CarsController::class, 'store'])->name("Add Car");
-    Route::put('/cars/{id}', [CarsController::class, 'update'])->name("Update Car");
-    Route::delete('/cars/{id}', [CarsController::class, 'destroy'])->name("Delete Car");
+    Route::group([], function(){
+        Route::get('/cars', [CarsController::class, 'index'])->name("api.cars.getbyquery");
+        Route::post('/cars/filterSearch', [CarsController::class, 'index'])->name("api.cars.getbyfilter");
+        Route::get('/cars/{id}', [CarsController::class, 'show'])->name("api.cars.getbyid");
+        Route::post('/cars', [CarsController::class, 'store'])->name("api.cars.add");
+        Route::put('/cars/{id}', [CarsController::class, 'update'])->name("api.cars.edit");
+        Route::delete('/cars/{id}', [CarsController::class, 'destroy'])->name("api.cars.delete");
+        Route::get('/cars/download', [CarsController::class, 'destroy'])->name("api.cars.download");
+    });
 });
