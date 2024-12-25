@@ -1,9 +1,45 @@
 import { columnDef, emptyCar } from "@/model";
 import { Car } from "@/types";
 import PrimaryButton from "./PrimaryButton";
-import { useRef, useState } from "react";
+import { ReactElement, useRef, useState } from "react";
 import Spinner from "./Spinner";
 import { usePage } from "@inertiajs/react";
+
+function formValidation(state: Car){///, setter: (state: any)=>void){
+    const required = columnDef.filter((col) => col.required);
+    const number = columnDef.filter((col) => col.type === "number");
+
+    if( // Required fields are not set
+        required.some((col) => {
+            const status = (state[col.type] === "number" ? state[col.key] < 0 : state[col.key] === "") || state[col.key] === null;
+            // console.log(status, col.header, state[col.key] )
+            // setter((val: any) => {
+            //     return {
+            //         ...val,
+            //         [col.key]: !status
+            //     }
+            // });
+            return status;
+        })
+    ) return false;
+
+    if( // Number fields are below 0
+        number.some((col) => {
+            const status = state[col.key] < 0;
+            // setter(
+            //     (val: any) => {
+            //         return {
+            //             ...val,
+            //             [col.key]: !status
+            //         }
+            //     }
+            // )
+            return status;
+        })
+    ) return false;
+
+    return true;
+}
 
 export default function FormCar({car, onCancel=()=>{}}: {car?: Car, onCancel?: ()=>void}){
     const { auth }: any = usePage().props;
@@ -11,6 +47,7 @@ export default function FormCar({car, onCancel=()=>{}}: {car?: Car, onCancel?: (
     const [data, setData] = useState<any>(car ? car : emptyCar);
     const [processing, setPost] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
+    const errorMsg = useRef<ReactElement | null>(null);
 
     // const delayRef = useRef<any>(null);
     const abortController = useRef<any>(null);
@@ -18,6 +55,13 @@ export default function FormCar({car, onCancel=()=>{}}: {car?: Car, onCancel?: (
     const handleSubmit = (e: any) => {
         e.preventDefault();
         setIsError(false);
+        if(!formValidation(data)){
+            setIsError(true);
+            errorMsg.current = <span>Form Validaiton Error!!
+                    <br />[Name, Origin and Model Year] are required fields!!
+                    <br /> Numeric values must not be less than 0.</span>;
+            return;
+        }
         if(processing) return;
 
         const endpiont = car ? route('api.cars.add') : route('api.cars.edit', {id: data?.id ?? -1});
@@ -40,6 +84,7 @@ export default function FormCar({car, onCancel=()=>{}}: {car?: Car, onCancel?: (
             }
         }).catch((err) => {
             setIsError(true);
+            errorMsg.current = <span>Could not save data!!!</span>;
         });
     };
 
@@ -56,7 +101,9 @@ export default function FormCar({car, onCancel=()=>{}}: {car?: Car, onCancel?: (
                         (col.key in data && col.key!='id') && <div key={col.key} className="flex flex-col space-y-1 pb-3 w-full">
                                 <label htmlFor={col.key}>{col.header}:</label>
                                 <input id={col.key} key={col.key} className="rounded w-full"
-                                    value={data[col.key]}
+                                    type={col.type}
+                                    value={data[col.key] == -1 ? null : data[col.key]}
+                                    required={col.required}
                                     onChange={(e)=> setData({
                                         ...data,
                                         [col.key]: e.target.value
@@ -66,7 +113,7 @@ export default function FormCar({car, onCancel=()=>{}}: {car?: Car, onCancel?: (
                     )
                 }
 
-                {isError && <span className="text-red-500 bg-red-100 p-4 w-full rounded">Could not save data!!!</span>}
+                {isError && <span className="text-red-500 bg-red-100 p-4 w-full rounded">{errorMsg.current}</span>}
 
                 <div className="self-end">
                     <PrimaryButton type='submit' onSubmit={handleSubmit}>
@@ -79,7 +126,9 @@ export default function FormCar({car, onCancel=()=>{}}: {car?: Car, onCancel?: (
                     <PrimaryButton type='button'
                         onSubmit={(e)=>e.preventDefault()}
                         onClick={()=>{
-                                abortController.current.abort()
+                                if (abortController.current) {
+                                    abortController.current.abort();
+                                }
                                 onCancel();
                             }}
                         >Cancel</PrimaryButton>
