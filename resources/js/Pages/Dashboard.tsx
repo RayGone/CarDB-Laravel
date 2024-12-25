@@ -195,6 +195,13 @@ export default function Dashboard({ auth }: PageProps) {
                         onCancel={()=>{
                             setOpenForm(false);
                             editCar.current = null;
+                        }}
+
+                        onSubmit={()=>{
+                            setOpenForm(false);
+                            editCar.current = null
+
+                            applyFilter(getFilter());
                         }}/>
                 </div>
             </Modal>

@@ -41,7 +41,7 @@ function formValidation(state: Car){///, setter: (state: any)=>void){
     return true;
 }
 
-export default function FormCar({car, onCancel=()=>{}}: {car?: Car, onCancel?: ()=>void}){
+export default function FormCar({car, onCancel=()=>{}, onSubmit= ()=>{}}: {car?: Car, onCancel?: ()=>void, onSubmit?: ()=>void}){
     const { auth }: any = usePage().props;
 
     const [data, setData] = useState<any>(car ? car : emptyCar);
@@ -64,7 +64,7 @@ export default function FormCar({car, onCancel=()=>{}}: {car?: Car, onCancel?: (
         }
         if(processing) return;
 
-        const endpiont = car ? route('api.cars.add') : route('api.cars.edit', {id: data?.id ?? -1});
+        const endpiont = !!car ? route('api.cars.edit', {id: data?.id ?? -1}) : route('api.cars.add');
         setPost(true);
 
         if (abortController.current) {
@@ -73,19 +73,52 @@ export default function FormCar({car, onCancel=()=>{}}: {car?: Car, onCancel?: (
 
         abortController.current = new AbortController();
 
-        abortController.current = window.axios.post(endpiont, data, {
-            headers:{
-                Authorization: `Bearer ${auth.apiToken}`
-            },
-            signal: abortController.current.signal
-        }).then((res) => {
-            if(res.data.status == 'success'){
-                onCancel();
-            }
-        }).catch((err) => {
-            setIsError(true);
-            errorMsg.current = <span>Could not save data!!!</span>;
-        });
+        if(!car){
+            window.axios.post(endpiont, data, {
+                headers:{
+                    Authorization: `Bearer ${auth.apiToken}`
+                },
+                signal: abortController.current.signal
+            }).then((res) => {
+                setPost(false);
+                abortController.current = null;
+                if(res.data.status == 'success'){
+                    onCancel();
+                    return;
+                }
+
+                setIsError(true);
+                throw new Error("Server didn't return success");
+            }).catch((err) => {
+                setPost(false);
+                setIsError(true);
+                errorMsg.current = <span>Could not save data!!!</span>;
+                abortController.current = null;
+            });
+        }
+        else{
+            window.axios.patch(endpiont, data, {
+                headers:{
+                    Authorization: `Bearer ${auth.apiToken}`
+                },
+                signal: abortController.current.signal
+            }).then((res) => {
+                setPost(false);
+                abortController.current = null;
+                if(res.data.status == 'success'){
+                    onSubmit();
+                    return;
+                }
+
+                setIsError(true);
+                throw new Error("Server didn't return success");
+            }).catch((err) => {
+                setPost(false);
+                setIsError(true);
+                errorMsg.current = <span>Could not save data!!!</span>;
+                abortController.current = null;
+            });
+        }
     };
 
     return (
