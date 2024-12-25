@@ -40,6 +40,6 @@ class Cars extends Model
 
     public function setOriginAttribute($origin)
     {
-        $this->attributes['name'] = mb_strtolower($origin);
+        $this->attributes['origin'] = mb_strtolower($origin);
     }
 }

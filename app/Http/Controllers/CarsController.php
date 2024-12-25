@@ -14,6 +14,19 @@ use App\Exports\CarsExport;
 class CarsController extends Controller
 {
     protected $carsRepository;
+    protected $rule = [
+        'id' => 'nullable|numeric|min:0',
+        'name' => 'required|string|max:255',
+        'origin' => 'required|string|max:255',
+        'model_year' => 'required|date|before_or_equal:today',
+        'acceleration' => 'nullable|numeric|min:0',
+        'horsepower' => 'nullable|numeric|min:0',
+        'mpg' => 'nullable|numeric|min:0',
+        'weight' => 'nullable|numeric|min:0',
+        'cylinders' => 'nullable|numeric|min:0',
+        'displacement' => 'nullable|numeric|min:0',
+    ];
+
     public function __construct(CarsRepository $carsRepository)
     {
         $this->carsRepository = $carsRepository;
@@ -44,7 +57,12 @@ class CarsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate($this->rule);
+        $car = $this->carsRepository->addCar($validated);
+
+        return response()->json([
+            "status"=>"success",
+            "created"=> $car]);
     }
 
     /**
@@ -68,17 +86,20 @@ class CarsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Cars $cars)
+    public function update(Request $request)
     {
-        //
+        $validated = $request->validate($this->rule);
+        return response()->json([
+            "status"=>"success",
+            "created"=> $validated]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Cars $cars)
+    public function destroy(int $id, Cars $car)
     {
-        //
+
     }
 
     /**

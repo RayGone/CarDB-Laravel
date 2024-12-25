@@ -2,10 +2,10 @@
 
 namespace App\Repositories;
 
+use App\Dtos\CarDto;
 use App\Models\Cars;
 use App\Dtos\FilterModel;
 use App\Enums\CarsAttributeEnum;
-use Illuminate\Support\Facades\Log;
 
 class CarsRepository{
     public function __construct(){}
@@ -47,6 +47,19 @@ class CarsRepository{
 
     public function queryOne(int $id){
         return Cars::find($id);
+    }
+
+    public function addCar(array $car){
+        $dto = (new CarDto($car))->toArray();
+        $oldCar = Cars::where("name",$dto['name'])->where("origin",$dto['origin'])->where("model_year",$dto['model_year'])->get();
+        if(count($oldCar))
+            return $oldCar;
+
+        // var_dump($oldCar);
+
+        unset($dto['id']);
+        $newCar = Cars::create($dto);
+        return $newCar;
     }
 }
 ?>

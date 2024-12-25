@@ -94,7 +94,7 @@ export const filterOps: OP[] = [
 export const emptyCar: Car = {
     name: "",
     origin: "",
-    model_year: -1,
+    model_year: new Date(),
     acceleration: undefined,
     horsepower: undefined,
     mpg: undefined,
