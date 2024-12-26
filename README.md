@@ -4,12 +4,12 @@ Welcome to CarDB, a simple web application project featuring modern UI framework
 
 ## Introduction
 
-This is a sub-project of [CarDB](github.com/raygone/CarDB). This project highlights a full-stack web application developed using Laravel for the back-end and InertiaJS with React and TailwindCSS for the front-end.
-
+This is a sub-project of [CarDB](github.com/raygone/CarDB). This project highlights a full-stack web application developed using Laravel for the back-end and InertiaJS with React and TailwindCSS for the front-end. The web-app consists of fully responsive and mobile-friendly design. The app is hosted on **Google Cloud Compute VM**.
 ## Features
 
 - **[React](./resources) UI:** A dynamic user interface built using @InertiaJS/React with Typescript and Styled with TailwindCSS.
 - **Laravel:** Robust API with Laravel Sanctum authentication using PostgreSQL database.
+- **Hosted on Google Cloud Compute VM**
 
 ## Setup
 
