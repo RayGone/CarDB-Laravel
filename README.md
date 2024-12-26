@@ -35,7 +35,7 @@ php -S localhost:8000 # to run locally
 ##===============================
 ## To run in Production
 composer install --no-dev # PHP
-npm install --omit=dev # node.js
+npm install # node.js
 #### In .env set
 APP_ENV=production
 APP_DEBUG=false
