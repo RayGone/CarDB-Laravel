@@ -126,7 +126,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                 </header>
             )}
 
-            <main className='overflow-hidden' style={{maxHeight: '90vh'}}>{children}</main>
+            <main className='overflow-auto' style={{maxHeight: '90vh'}}>{children}</main>
         </div>
     );
 }
