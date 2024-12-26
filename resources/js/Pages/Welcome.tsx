@@ -19,14 +19,14 @@ export default function Welcome({ auth, laravelVersion, phpVersion }: PageProps<
                         <>
                             <Link
                                 href={route('login')}
-                                className="font-semibold text-gray-600 hover:bg-yellow-50 rounded-5 px-3 py-1 rounded hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-yellow-100"
+                                className="font-semibold text-gray-600 rounded-5 px-3 py-1 rounded hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-yellow-100"
                             >
                                 Log in
                             </Link>
 
                             <Link
                                 href={route('register')}
-                                className="ms-4 font-semibold text-gray-600 hover:bg-yellow-50 rounded-5 px-3 py-1 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-yellow-100"
+                                className="ms-4 font-semibold text-gray-600 rounded-5 px-3 py-1 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-yellow-100"
                             >
                                 Register
                             </Link>
@@ -36,7 +36,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }: PageProps<
 
                 <div className="max-w-7xl mx-auto p-6 lg:p-8">
                     <div className="flex justify-center items-center px-4 py-4 shadow-sm">
-                        <h3 className='px-3 text-4xl font-semibold'>CarDB</h3>
+                        <h3 className='px-3 text-4xl font-semibold text-gray-900 dark:text-gray-100'>CarDB</h3>
                         <ApplicationLogo />
                     </div>
 
