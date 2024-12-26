@@ -45,3 +45,11 @@ npm run build
 ## configure apache2 and set
 DocumentRoot <path-to-project>/public 
 ```
+
+## Demo
+You can check the demo at this URL: [laracar.sushmaregan.com](https://laracar.sushmaregan.com)
+
+> Don't want to register? use this credentials <br>
+- Email: demo@noemail.com<br>
+- Pass: P@55word
+ 
