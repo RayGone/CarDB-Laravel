@@ -3,6 +3,7 @@
 use App\Http\Controllers\CarsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [CarsController::class, 'store'])->name("api.cars.add");
         Route::patch('/{id}', [CarsController::class, 'update'])->name("api.cars.edit");
         Route::delete('/{id}', [CarsController::class, 'destroy'])->name("api.cars.delete");
-        Route::get('/download/{type}', [CarsController::class, 'download'])->name("api.cars.download")->withoutMiddleware('auth:sanctum');
+        Route::match(["GET", "POST"],"/download/{type}", [CarsController::class, 'download'])
+            ->name("api.cars.download")
+            ->withoutMiddleware('auth:sanctum')
+            ->middleware(ThrottleRequests::with(5,2));
+        ;
     });
-});
+})->namespace("Cars");
