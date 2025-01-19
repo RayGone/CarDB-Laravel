@@ -19,5 +19,6 @@ yarn-error.log
 /.vscode
 
 data.json
+TestPage.tsx
 
 stubs

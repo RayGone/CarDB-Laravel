@@ -23,7 +23,7 @@ class FilterModel{
         string | null $search="")
     {
         $this->filters = $filters ? $filters : [];
-        $this->limit = $limit ? $limit : 5;
+        $this->limit = $limit ? $limit : 20;
         $this->page = $page ? $page : 0;
         $this->order = $order ? SortOrderEnum::from($order) : SortOrderEnum::ASC;
         $this->orderBy = $orderBy ? CarsAttributeEnum::from($orderBy) : CarsAttributeEnum::ID;
@@ -32,7 +32,7 @@ class FilterModel{
 
     public static function init(array $model){
         $filters = [];
-        if(count($model['filter']) > 0){
+        if(isset($model['filter']) && count($model['filter']) > 0){
             foreach($model['filter'] as $f){
                 $cf = new ConditionDto($f);
                 array_push($filters, $cf);

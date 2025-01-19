@@ -1,8 +1,12 @@
 <?php
 
+use App\Dtos\FilterModel;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\RedirectIfAuthenticated;
+use App\Models\Cars;
+use App\Repositories\CarsRepository;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -26,14 +30,20 @@ Route::get('/', function () {
     ]);
 })->middleware([RedirectIfAuthenticated::class])->name("start");
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+
+    Route::get('/dashboard', function () {
+        $repo = new CarsRepository();
+        $data = $repo->query([]);
+
+        return Inertia::render('Dashboard', [
+            'carData' => $data,
+        ]);
+    })->name('dashboard');
 });
 
 require __DIR__.'/auth.php';

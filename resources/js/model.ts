@@ -133,3 +133,13 @@ export const getFilter = () => {
         return JSON.parse(fs)
     return initFilter
 }
+
+
+export const isInitFilter = (f: DataFilterModel) => {
+    if(JSON.stringify(f.filter) == JSON.stringify(initFilter.filter) && f.limit == initFilter.limit && f.orderBy == initFilter.orderBy
+        && f.order == initFilter.order && f.limit == initFilter.limit && f.page == initFilter.page && f.search == initFilter.search)
+        return true;
+
+    return false;
+}
+
