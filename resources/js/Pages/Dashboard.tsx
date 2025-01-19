@@ -21,7 +21,11 @@ export default function Dashboard({ auth, carData }: PageProps<{ carData: CarRes
     const editCar = useRef<any>(null);
 
     useEffect(() => {
-        if(isInitFilter(pageFilter)) return;
+        if(isInitFilter(pageFilter)) {
+            setCars(carData);
+            return;
+        }
+
         setLoading(true);
         if (abortController.current.control) {
             abortController.current.control.abort();
