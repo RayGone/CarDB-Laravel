@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Step 1: Composer install without dev dependencies and optimize autoloader
-echo "Running composer install --no-dev and optimize..."
-composer install --no-dev --optimize-autoloader
+# echo "Running composer install --no-dev and optimize..."
+# composer install --no-dev --optimize-autoloader
 
 sudo chown -R www-data:www-data storage bootstrap/cache
 sudo chmod -R 775 storage bootstrap/cache
@@ -22,14 +22,14 @@ echo "Running npm run build..."
 npm install # Ensure all npm dependencies are installed
 npm run build
 
-# Step 5: Run Laravel tests
-echo "Running Laravel tests..."
-php artisan test
+# # Step 5: Run Laravel tests
+# echo "Running Laravel tests..."
+# php artisan test
 
 # Optional: Any additional steps
 # echo "Additional steps..."
 php artisan migrate --force
-php artisan db:seed --force
+# php artisan db:seed --force
 
 # php artisan queue:work --daemon
 

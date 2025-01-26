@@ -1,0 +1,35 @@
+name: Deploy to GCloud Compute Enginge VM
+
+on:
+  push:
+    branches:
+      - triggers
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        version: 'latest'
+        service_account_key: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
+        project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+
+    - name: SSH and deploy
+      run: |
+        gcloud compute ssh --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE $GCLOUD_VM_INSTANCE --command="
+        cd /path/to/your/project &&
+        sudo git pull &&
+        npm install &&
+        npm run build &&
+        pm2 start ./dist/index.js
+        "
+      env:
+        GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
+        GCLOUD_ZONE: ${{ secrets.GCLOUD_ZONE }}
+        GCLOUD_VM_INSTANCE: ${{ secrets.GCLOUD_VM_INSTANCE }}
