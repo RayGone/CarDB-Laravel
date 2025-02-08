@@ -51,7 +51,14 @@ jobs:
       #   run: 'gcloud info'
 
       - name: SCP COMPOSER VENDOR FILES
-        run: gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE --recurse .  $GCLOUD_VM_INSTANCE:scp 
+        run: |
+          gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE --recurse node_modules  $GCLOUD_VM_INSTANCE:scp
+          gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE --recurse public/build  $GCLOUD_VM_INSTANCE:scp
+          gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE --recurse vendor  $GCLOUD_VM_INSTANCE:scp
+          gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE composer.json  $GCLOUD_VM_INSTANCE:scp
+          gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE composer.lock  $GCLOUD_VM_INSTANCE:scp
+          gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE package-lock.json  $GCLOUD_VM_INSTANCE:scp
+          gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE package.json  $GCLOUD_VM_INSTANCE:scp
         env:
           GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
           GCLOUD_ZONE: ${{ secrets.GCLOUD_ZONE }}
