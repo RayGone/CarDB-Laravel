@@ -57,7 +57,7 @@ jobs:
           cd /var/opt/laracar.sushmaregan.com/ &&
           sudo git pull &&
           npm install &&
-          npm run build &&
+          npm run build
           "
         env:
           GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
