@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Running composer install --no-dev and optimize..."
+composer install --no-dev --optimize-autoloader
+
 echo "Move Files Uploaded From Github Actions"
 sudo rm -rf ./composer.*
 sudo rm -rf ./vendor
