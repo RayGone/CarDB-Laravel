@@ -19,6 +19,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install PHP Dependencies
+        # Have to composer install because one of the front-end package (ziggy-js) depends on PHP package
+        ## NPM INSTALL will fail if PHP package is not pre-installed.
         uses: php-actions/composer@v6
         with:
           dev: no
@@ -51,7 +53,10 @@ jobs:
       # - name: 'Check GCLOUD CLI'
       #   run: 'gcloud info'
 
-      - name: SCP COMPOSER VENDOR FILES
+      ## Front-end packages are only dev dependencies
+      ### So, rather than doing install and build in production
+      #### Uploading the build files seems more cost-effective
+      - name: SCP FRONT END BUILD FILES
         run: |
           echo "Uploading public/build..."
           gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE --recurse public/build  $GCLOUD_VM_INSTANCE:scp
@@ -63,17 +68,15 @@ jobs:
       - name: SSH and deploy
         run: |
           gcloud compute ssh --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE $GCLOUD_VM_INSTANCE --command="
-            echo \"Switching to Project Directory\"
+            echo \"1. Switching to Project Directory\" &&
             cd /var/opt/laracar.sushmaregan.com/ &&
-            echo \"GIT Clean Files\"
-            sudo git status &&
-            sudo git restore storage/* *.sh package* composer.* bootstrap* &&
+            echo \"2. GIT Clean Files\" &&
+            sudo git restore storage *.sh bootstrap &&
             sudo git clean -fd &&
-            echo \"GIT PULL\"
-            sudo git switch triggers &&
+            echo \"3. GIT PULL\" &&
             sudo git pull &&
+            echo \"4. Run Startup Shell\" &&
             sudo chmod +x ./actions.sh &&
-            echo \"Run Startup Shell\"
             sudo ./actions.sh
           "
         env:
@@ -81,9 +84,3 @@ jobs:
           GCLOUD_ZONE: ${{ secrets.GCLOUD_ZONE }}
           GCLOUD_VM_INSTANCE: ${{ secrets.GCLOUD_VM_INSTANCE }}
           GCLOUD_SERVICE_ACCOUNT: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_EMAIL }}
-
-      #     cd /var/opt/laracar.sushmaregan.com/ &&
-      #     sudo git pull &&
-      #     npm install &&
-      #     npm run build
-      #     "
