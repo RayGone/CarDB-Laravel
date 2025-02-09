@@ -82,7 +82,7 @@ jobs:
           GCLOUD_ZONE: ${{ secrets.GCLOUD_ZONE }}
           GCLOUD_VM_INSTANCE: ${{ secrets.GCLOUD_VM_INSTANCE }}
           GCLOUD_SERVICE_ACCOUNT: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_EMAIL }}
-          
+
       #     cd /var/opt/laracar.sushmaregan.com/ &&
       #     sudo git pull &&
       #     npm install &&
