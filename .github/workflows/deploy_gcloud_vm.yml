@@ -71,10 +71,15 @@ jobs:
       - name: SSH and deploy
         run: |
           gcloud compute ssh --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE $GCLOUD_VM_INSTANCE --command="
+            echo \"Switching to Project Directory\"
             cd /var/opt/laracar.sushmaregan.com/ &&
-            ls -al &&
+            echo \"GIT Clean Files\"
+            sudo git clean -fd &&
+            echo \"GIT PULL\"
+            sudo git switch triggers &&
             sudo git pull &&
             sudo chmod +x ./actions.sh &&
+            echo \"Run Startup Shell\"
             sudo ./actions.sh
           "
         env:
