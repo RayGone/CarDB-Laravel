@@ -77,13 +77,14 @@ jobs:
             sudo chmod +x ./actions.sh &&
             sudo ./actions.sh
           "
+        env:
+          GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
+          GCLOUD_ZONE: ${{ secrets.GCLOUD_ZONE }}
+          GCLOUD_VM_INSTANCE: ${{ secrets.GCLOUD_VM_INSTANCE }}
+          GCLOUD_SERVICE_ACCOUNT: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_EMAIL }}
+          
       #     cd /var/opt/laracar.sushmaregan.com/ &&
       #     sudo git pull &&
       #     npm install &&
       #     npm run build
       #     "
-      #   env:
-      #     GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
-      #     GCLOUD_ZONE: ${{ secrets.GCLOUD_ZONE }}
-      #     GCLOUD_VM_INSTANCE: ${{ secrets.GCLOUD_VM_INSTANCE }}
-      #     GCLOUD_SERVICE_ACCOUNT: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_EMAIL }}
