@@ -4,13 +4,7 @@ echo "Running composer install --no-dev and optimize..."
 composer install --no-dev --optimize-autoloader
 
 echo "Move Files Uploaded From Github Actions"
-sudo rm -rf ./composer.*
-sudo rm -rf ./vendor
 sudo rm -rf ./public/build
-
-sudo mv /home/runner/scp/vendor ./
-sudo mv /home/runner/scp/composer.json ./
-sudo mv /home/runner/scp/composer.lock ./
 sudo mv /home/runner/scp/build ./public/build
 
 sudo chown -R www-data:www-data storage bootstrap/cache

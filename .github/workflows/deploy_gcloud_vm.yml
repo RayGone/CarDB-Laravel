@@ -51,22 +51,22 @@ jobs:
       # - name: 'Check GCLOUD CLI'
       #   run: 'gcloud info'
 
-      # - name: SCP COMPOSER VENDOR FILES
-      #   run: |
-      #     # gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE --recurse node_modules  $GCLOUD_VM_INSTANCE:scp
-      #     echo "Uploading public/build..."
-      #     gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE --recurse public/build  $GCLOUD_VM_INSTANCE:scp
-      #     echo "Uploading vendor..."
-      #     gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE --recurse vendor  $GCLOUD_VM_INSTANCE:scp
-      #     echo "Uploading composer.json & composer.lock"
-      #     gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE composer.json  $GCLOUD_VM_INSTANCE:scp
-      #     gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE composer.lock  $GCLOUD_VM_INSTANCE:scp
-      #     # gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE package-lock.json  $GCLOUD_VM_INSTANCE:scp
-      #     # gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE package.json  $GCLOUD_VM_INSTANCE:scp
-      #   env:
-      #     GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
-      #     GCLOUD_ZONE: ${{ secrets.GCLOUD_ZONE }}
-      #     GCLOUD_VM_INSTANCE: ${{ secrets.GCLOUD_VM_INSTANCE }}
+      - name: SCP COMPOSER VENDOR FILES
+        run: |
+          echo "Uploading public/build..."
+          gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE --recurse public/build  $GCLOUD_VM_INSTANCE:scp
+          # gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE --recurse node_modules  $GCLOUD_VM_INSTANCE:scp
+          # echo "Uploading vendor..."
+          # gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE --recurse vendor  $GCLOUD_VM_INSTANCE:scp
+          # echo "Uploading composer.json & composer.lock"
+          # gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE composer.json  $GCLOUD_VM_INSTANCE:scp
+          gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE composer.lock  $GCLOUD_VM_INSTANCE:scp
+          gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE package-lock.json  $GCLOUD_VM_INSTANCE:scp
+          # gcloud compute scp --project=$GCLOUD_PROJECT_ID --zone=$GCLOUD_ZONE package.json  $GCLOUD_VM_INSTANCE:scp
+        env:
+          GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
+          GCLOUD_ZONE: ${{ secrets.GCLOUD_ZONE }}
+          GCLOUD_VM_INSTANCE: ${{ secrets.GCLOUD_VM_INSTANCE }}
 
       - name: SSH and deploy
         run: |
@@ -74,6 +74,7 @@ jobs:
             echo \"Switching to Project Directory\"
             cd /var/opt/laracar.sushmaregan.com/ &&
             echo \"GIT Clean Files\"
+            sudo git restore * &&
             sudo git clean -fd &&
             echo \"GIT PULL\"
             sudo git switch triggers &&
