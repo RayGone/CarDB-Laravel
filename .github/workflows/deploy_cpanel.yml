@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: 'Build Environment'
+    environment: 'CPanel'
     permissions:
       id-token: write
       contents: read
@@ -36,6 +36,23 @@ jobs:
         run: |
           npm install
           npm install -D @types/ziggy-js
+        env:
+          VITE_APP_NAME: ${{vars.APP_NAME}}
+          VITE_PUSHER_APP_KEY: ${{secrets.PUSHER_APP_KEY}}
+          VITE_PUSHER_HOST: ${{vars.PUSHER_HOST}}
+          VITE_PUSHER_PORT: ${{vars.PUSHER_PORT}}
+          VITE_PUSHER_SCHEME: ${{vars.PUSHER_SCHEME}}
+          VITE_PUSHER_APP_CLUSTER: ${{vars.PUSHER_APP_CLUSTER}}
 
       - name: Make Frontend Build
         run: npm run build
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          protocol: ftps
+          password: ${{ secrets.FTP_PASSWORD }}
+          local_dir: UI/CarDB-React/build
+          server_dir: ${{ secrets.REACT_SERVER_DIR }}
