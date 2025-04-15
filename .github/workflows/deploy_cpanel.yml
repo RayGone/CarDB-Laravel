@@ -1,4 +1,4 @@
-name: Deploy to GCloud Compute Enginge VM
+name: Deploy to CPanel
 
 on:
   push:
