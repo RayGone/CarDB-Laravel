@@ -1,0 +1,41 @@
+name: Deploy to GCloud Compute Enginge VM
+
+on:
+  push:
+    branches:
+      - deploy-cpanel
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: 'Build Environment'
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PHP Dependencies
+        # Have to composer install because one of the front-end package (ziggy-js) depends on PHP package
+        ## NPM INSTALL will fail if PHP package is not pre-installed.
+        uses: php-actions/composer@v6
+        with:
+          dev: no
+          args: --profile --ignore-platform-reqs
+
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '>=20.11.0'
+          cache: 'npm'
+          cache-dependency-path: './package-lock.json'
+
+      - name: Install Node Depend
+        run: |
+          npm install
+          npm install -D @types/ziggy-js
+
+      - name: Make Frontend Build
+        run: npm run build
