@@ -1,0 +1,81 @@
+name: Deploy to CPanel
+
+on:
+  push:
+    branches:
+      - deploy-cpanel
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: 'CPanel'
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PHP Dependencies
+        # Have to composer install because one of the front-end package (ziggy-js) depends on PHP package
+        ## NPM INSTALL will fail if PHP package is not pre-installed.
+        uses: php-actions/composer@v6
+        with:
+          dev: no
+          args: --profile --ignore-platform-reqs
+
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '>=20.11.0'
+          # cache: 'npm'
+          # cache-dependency-path: './package-lock.json'
+
+      - name: Install Node Depend
+        run: |
+          npm install
+          npm install -D @types/ziggy-js
+
+      - name: Make Frontend Build
+        run: npm run build
+        env:
+          VITE_APP_NAME: ${{vars.APP_NAME}}
+          VITE_PUSHER_APP_KEY: ${{secrets.PUSHER_APP_KEY}}
+          VITE_PUSHER_HOST: ${{vars.PUSHER_HOST}}
+          VITE_PUSHER_PORT: ${{vars.PUSHER_PORT}}
+          VITE_PUSHER_SCHEME: ${{vars.PUSHER_SCHEME}}
+          VITE_PUSHER_APP_CLUSTER: ${{vars.PUSHER_APP_CLUSTER}}
+
+      - name: Directory Permissions
+        run: chmod -R 775 storage
+
+      - name: Setup Environment Variables
+        run: |
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Clear Caches
+        run: php artisan optimize:clear
+
+      - name: Storage link
+        run: php artisan storage:link --force
+
+      - name: ZIP Vendor
+        run: zip -r vendor.zip vendor
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          protocol: ftps
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ vars.SERVER_DIR }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/vendor/**
+            **/favicon.ico
+            **/.env*
+
