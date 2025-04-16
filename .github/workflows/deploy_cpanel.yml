@@ -76,4 +76,5 @@ jobs:
             **/.git*/**
             **/node_modules/**
             **/vendor/**
+            **/favicon.ico
 
