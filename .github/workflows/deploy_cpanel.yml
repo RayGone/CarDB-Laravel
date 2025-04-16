@@ -50,10 +50,9 @@ jobs:
       - name: Directory Permissions
         run: chmod -R 775 storage
 
-      - name: Generate key
+      - name: Setup Environment Variables
         run: |
-          run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-          php artisan key:generate
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
 
       - name: Clear Caches
         run: php artisan optimize:clear
