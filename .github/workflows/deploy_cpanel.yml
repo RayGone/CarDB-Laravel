@@ -51,7 +51,9 @@ jobs:
         run: chmod -R 775 storage
 
       - name: Generate key
-        run: php artisan key:generate
+        run: |
+          run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+          php artisan key:generate
 
       - name: Clear Caches
         run: php artisan optimize:clear
