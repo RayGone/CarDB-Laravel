@@ -77,5 +77,4 @@ jobs:
             **/node_modules/**
             **/vendor/**
             **/favicon.ico
-            **/.env*
 
