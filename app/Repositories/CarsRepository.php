@@ -54,7 +54,7 @@ class CarsRepository{
     public function addCar(array $car)
     {
         $dto = (new CarDto($car))->toArray();
-        $oldCar = Cars::where("name",$dto['name'])->where("origin",$dto['origin'])->where("model_year",$dto['model_year'])->get();
+        $oldCar = Cars::where(CarsAttributeEnum::NAME->value,$dto['name'])->where("origin",$dto['origin'])->where("model_year",$dto['model_year'])->get();
         if(count($oldCar))
             return $oldCar;
 
@@ -86,6 +86,26 @@ class CarsRepository{
             $dbCar->delete();
 
         return $dto1;
+    }
+
+    public function listModelYears()
+    {
+        $years = Cars::distinct()->get(CarsAttributeEnum::MODEL_YEAR->value)->toArray();
+        $r = array_map(function($i){return $i[CarsAttributeEnum::MODEL_YEAR->value];}, $years);
+        return $r;
+    }
+
+    public function distinctBrands()
+    {
+        $brands = [];
+        $names = Cars::get(CarsAttributeEnum::NAME->value)->toArray();
+        foreach($names as $name){
+            $brand = explode(" ", $name[CarsAttributeEnum::NAME->value])[0];
+            if(!in_array($brand, $brands)){
+                array_push($brands, $brand);
+            }
+        }
+        return $brands;
     }
 }
 ?>

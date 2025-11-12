@@ -44,6 +44,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'carData' => $data,
         ]);
     })->name('dashboard');
+
+    Route::get('/charts', function () {
+        $repo = new CarsRepository();
+        $data = $repo->listModelYears();
+        $brands = $repo->distinctBrands();
+
+        return Inertia::render('Charts/Charts', [
+            "years" => $data,
+            "brands" => $brands
+        ]);
+    })->name('charts');
 });
 
 require __DIR__.'/auth.php';
