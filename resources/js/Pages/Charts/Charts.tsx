@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Label, Field } from '@headlessui/react';
-import { ChevronDownIcon } from "@heroicons/react/24/solid";
+// import { Listbox, ListboxButton, ListboxOptions, ListboxOption, Label, Field } from '@headlessui/react';
+// import { ChevronDownIcon } from "@heroicons/react/24/solid";
 
 import { ChartsWrapper } from './Charts.styled';
 
@@ -13,7 +13,6 @@ import { Data } from 'plotly.js';
 type modelCountPerYear = {model_year: string[], count: number[]}
 type dictionary = {[index: string]: number | string | boolean}
 type array_dictionary = {[index: string]: (number | string | boolean)[]}
-
 
 export default function Charts({ auth, years, brands }: PageProps<{"years": string[], "brands": string[]}>) {
     // console.log({years, brands})
@@ -37,6 +36,7 @@ export default function Charts({ auth, years, brands }: PageProps<{"years": stri
 
     const d: {[index: string]: array_dictionary} = {};
     let stackedChart: any = [];
+    let originPieChartData: any = {};
 
     for(let i=0; i<countModelOriginPerYear.length; i++){
         let key = countModelOriginPerYear[i]['origin'] as string;
@@ -55,8 +55,11 @@ export default function Charts({ auth, years, brands }: PageProps<{"years": stri
             x: d[k]['model_year'],
             y: d[k]['count'],
             name: k
-        })
+        });
+
+        originPieChartData[k] = (d[k]['count'] as number[]).reduce((total, current) => total + current, 0)
     }
+    const originPieChart: Data[] = [{type: "pie", values: Object.values(originPieChartData), labels: Object.keys(originPieChartData)}];
 
     useEffect(() => {
         console.log({selectedBrand});
@@ -97,8 +100,8 @@ export default function Charts({ auth, years, brands }: PageProps<{"years": stri
             className='hidden md:block'
             header={<h2 className='font-semibold text-xl text-gray-800 leading-tight'><span>Charts</span></h2>}
         >
-            <div className='w-[99vw] h-[85vh] block p-2'>
-                <div className='flex w-full content-center gap-2 bg-orange-50 p-2'>
+            <div className='w-[99vw] h-[85vh] block'>
+                {/* <div className='hidden flex w-full content-center gap-2 bg-orange-50 p-2'>
                     <div className='bg-gray-50 p-1 rounded w-150'>
                         <Field className={"flex items-center gap-2 no-wrap text-center my-auto text-gray-800"}>
                             <Label>Brand: </Label>
@@ -138,29 +141,39 @@ export default function Charts({ auth, years, brands }: PageProps<{"years": stri
                             </Listbox>
                         </Field>
                     </div>
-                </div>
+                </div> */}
 
                 {/* =====Charts Below====== */}
-                <div className="grid md:grid-cols-2 xl:grid-cols-4 grid-cols-1 grid-gap-1">
-                    <ChartsWrapper className='col-span-1 sm:col-span-2'>
+                <div className="grid grid-cols-2">
+                    <ChartsWrapper className='md:col-span-1 col-span-2'>
                         <Plot
                             data={barChart}
-                            layout={{title: {text: 'New Models Per year'}, height: 400}}
+                            layout={{title: {text: 'Car Models / year'}, height: 400}}
                             config={{responsive: true}}
                             className='w-full block'
                             revision={mpyUpdate}
                         />
                     </ChartsWrapper>
-                    <ChartsWrapper className='col-span-1 sm:col-span-2'>
+                    <ChartsWrapper className='md:col-span-1 col-span-2'>
                         <Plot
-                            data={stackedChart}
-                            layout={{title: {text: 'Car Model Per Year with Origin'},
-                                barmode: 'group', height: 400}}
+                            data={originPieChart}
+                            layout={{title: {text: 'Car Models / Origin'}, height: 400}}
                             config={{responsive: true}}
-                            className="w-full"
+                            className="w-full block"
+                            revision={mpyUpdate}
                         />
                     </ChartsWrapper>
                 </div>
+
+                <ChartsWrapper className=''>
+                    <Plot
+                        data={stackedChart}
+                        layout={{title: {text: 'New Car Model / Year / Origin'},
+                            barmode: 'group', height: 400}}
+                        config={{responsive: true}}
+                        className="w-full"
+                    />
+                </ChartsWrapper>
             </div>
         </AuthenticatedLayout>
         </>
