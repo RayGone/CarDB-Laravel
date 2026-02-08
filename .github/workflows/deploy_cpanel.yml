@@ -34,7 +34,7 @@ jobs:
 
       - name: Install Node Depend
         run: |
-          npm install
+          npm install --force
           npm install -D @types/ziggy-js
 
       - name: Make Frontend Build
