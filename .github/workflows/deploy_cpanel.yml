@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install PHP Dependencies
         # Have to composer install because one of the front-end package (ziggy-js) depends on PHP package
