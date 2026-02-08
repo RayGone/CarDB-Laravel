@@ -6,11 +6,11 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link } from '@inertiajs/react';
 import { User } from '@/types';
 
-export default function Authenticated({ user, header, children }: PropsWithChildren<{ user: User, header?: ReactNode }>) {
+export default function Authenticated({ user, header, children, className='' }: PropsWithChildren<{ user: User, header?: ReactNode, className?: string }>) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className={'min-h-screen bg-gray-100' + className}>
             <nav className="bg-white border-b border-gray-100">
                 <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
@@ -24,6 +24,12 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink href={route('dashboard')} active={route().current('dashboard')}>
                                     Dashboard
+                                </NavLink>
+                            </div>
+
+                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                <NavLink href={route('charts')} active={route().current('charts')}>
+                                    Charts
                                 </NavLink>
                             </div>
                         </div>
@@ -56,7 +62,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
+                                        {/* <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link> */}
                                         <Dropdown.Link href={route('logout')} method="post" as="button">
                                             Log Out
                                         </Dropdown.Link>
@@ -97,6 +103,11 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                             Dashboard
                         </ResponsiveNavLink>
                     </div>
+                    <div className="pt-2 pb-3 space-y-1">
+                        <ResponsiveNavLink href={route('charts')} active={route().current('charts')}>
+                            Charts
+                        </ResponsiveNavLink>
+                    </div>
 
                     <div className="pt-4 pb-1 border-t border-gray-200">
                         <div className="px-4">
@@ -117,7 +128,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
             </nav>
 
             {header && (
-                <header className="bg-white shadow">
+                <header className="bg-white shadow mb-2">
                     <div className="max-w-full mx-auto py-2 px-4 sm:px-6 lg:px-8">
                         <div className='flex justify-between items-center'>
                             {header}

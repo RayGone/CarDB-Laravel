@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout repository - ${{ secrets.GCLOUD_PROJECT_ID }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install PHP Dependencies
         # Have to composer install because one of the front-end package (ziggy-js) depends on PHP package
@@ -32,7 +32,7 @@ jobs:
 
       - name: Install Node Depend
         run: |
-          npm install
+          npm install --force
           npm install -D @types/ziggy-js
 
       - name: Make Frontend Build

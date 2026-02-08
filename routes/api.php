@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CarsController;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Middleware\ThrottleRequests;
@@ -25,7 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [CarsController::class, 'index'])->name("api.cars.getbyquery");
         Route::post('/filterSearch', [CarsController::class, 'index'])->name("api.cars.getbyfilter");
         Route::get('/{id}', [CarsController::class, 'show'])->name("api.cars.getbyid");
-        Route::post('/', [CarsController::class, 'store'])->name("api.cars.add");
+        Route::post('/', [CarsController::class, 'store'])
+            ->name("api.cars.add")
+            ->middleware(ThrottleRequests::with(20, 1)); // 20 requests per minute.
         Route::patch('/{id}', [CarsController::class, 'update'])->name("api.cars.edit");
         Route::delete('/{id}', [CarsController::class, 'destroy'])->name("api.cars.delete");
         Route::match(["GET", "POST"],"/download/{type}", [CarsController::class, 'download'])
@@ -33,5 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
             ->withoutMiddleware('auth:sanctum')
             ->middleware(ThrottleRequests::with(5,2));
         ;
+
+        Route::post("/countPerYear", [CarsController::class, 'modelPerYear'])->name("api.cars.countPerYear");
     });
 })->namespace("Cars");

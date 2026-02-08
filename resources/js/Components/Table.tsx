@@ -106,7 +106,7 @@ export default function Table({data, onFilter, onEdit, onDelete, loading=false}:
                                                         if(f.current.page > maxPage) f.current.page = maxPage;
                                                         onFilter(f.current);
                                                     }}
-                                                    className="py-2 px-3 leading-tight text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700">Previous</a>
+                                                    className="py-2 px-3 leading-tight text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700">Prev</a>
                                             </li>
                                             <li>
                                                 <input className="px-3 min-w-16 md:min-w-20 py-1.5 text-gray-500 bg-white border border-gray-300
