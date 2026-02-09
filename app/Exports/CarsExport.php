@@ -3,10 +3,8 @@
 namespace App\Exports;
 
 use App\Models\Cars;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-class CarsExport implements FromCollection, WithHeadings, WithMapping
+
+class CarsExport
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -37,6 +35,16 @@ class CarsExport implements FromCollection, WithHeadings, WithMapping
             $cars->cylinders,
             $cars->displacement
         ];
+    }
+
+    public function toCsv(){
+        $cars = $this->collection();
+
+        $csv = join(",", $this->headings());
+        foreach($cars as $car){
+            $csv .= "\r\n".join(",", $this->map($car));
+        }
+        return $csv;
     }
 
     public function toJson(){

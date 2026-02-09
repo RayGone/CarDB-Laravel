@@ -1,4 +1,4 @@
-import { Column, OP, CarResponse, DataFilterModel, FilterModel, Car } from "@/types";
+import type { Column, OP, CarResponse, DataFilterModel, FilterModel, Car } from "@/types";
 
 export const columnDef: Column[] = [
   {

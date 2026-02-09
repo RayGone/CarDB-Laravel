@@ -1,16 +1,33 @@
 import { Head, usePage } from '@inertiajs/react';
-import { CarResponse, DataFilterModel, PageProps } from '@/types';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import Table from '@/Components/Table';
 import { useEffect, useRef, useState } from 'react';
-import {getFilter, setFilter, isInitFilter} from "@/model";
-import FilterView from '@/Components/FilterView';
-import Modal from '@/Components/Modal';
-import FormCar from '@/Components/FormCar';
-import DashboardHeader from '../Components/DashboardHeader';
+import axiosInstance from '@/bootstrap';
 
-export default function Dashboard({ auth, carData }: PageProps<{ carData: CarResponse }>) {
-    const [cars, setCars] = useState<CarResponse>(carData);
+import DashboardHeader from '@/components/custom/DashboardHeader';
+import FilterView from '@/components/custom/FilterView';
+import FormCar from '@/components/custom/FormCar';
+import Modal from '@/components/custom/Modal';
+import Table from '@/components/custom/Table';
+
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import AppLayout from '@/layouts/app-layout';
+import {getFilter, setFilter, isInitFilter} from "@/model";
+import { dashboard } from '@/routes';
+import { deleteMethod, getbyfilter } from '@/routes/api/cars';
+import { type SharedData, type BreadcrumbItem, type CarResponse, type DataFilterModel } from '@/types';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: dashboard().url,
+    },
+];
+
+const emptyResponse = {cars: [], total:0}
+
+export default function Dashboard() {
+    const { props } = usePage<SharedData>();
+
+    const [cars, setCars] = useState<CarResponse>(emptyResponse);
     const [pageFilter, setPageFilter] = useState<DataFilterModel>(getFilter());
     const [loading, setLoading] = useState<boolean>(false);
     const [isFilter, setIsFilter] = useState<boolean>(false);
@@ -22,20 +39,21 @@ export default function Dashboard({ auth, carData }: PageProps<{ carData: CarRes
 
     useEffect(() => {
         if(isInitFilter(pageFilter)) {
-            setCars(carData);
-            return;
+            // setCars(carData);
+            // return;
         }
 
         setLoading(true);
-        if (abortController.current.control) {
+        if (abortController?.current?.control) {
             abortController.current.control.abort();
         }
 
         abortController.current.control = new AbortController();
 
-        window.axios.post(route('api.cars.getbyfilter'),pageFilter, {
+        console.log(getbyfilter().url)
+        axiosInstance.post(getbyfilter().url ,pageFilter, {
             headers:{
-                Authorization: `Bearer ${auth.apiToken}`
+                Authorization: `Bearer ${props.auth.apiToken}`
             },
             signal: abortController.current.control.signal
         }).then((res) => {
@@ -45,7 +63,7 @@ export default function Dashboard({ auth, carData }: PageProps<{ carData: CarRes
                 setLoading(false);
             }
         }).catch((err) => {
-            // console.log({err})
+            console.log({err})
             setLoading(false)
         });
     },[pageFilter]);
@@ -61,30 +79,43 @@ export default function Dashboard({ auth, carData }: PageProps<{ carData: CarRes
     }
 
     return (
-        <>
-        <Head title="Dashboard" />
-        <AuthenticatedLayout
-            user={auth.user}
-            header={
-                <DashboardHeader
-                    onSearch={(s)=>{
-                        const f = {
-                            ...pageFilter,
-                            search: s
-                        };
-                        applyFilter(f)
-                    }}
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Dashboard" />
+            <DashboardHeader
+                onSearch={(s)=>{
+                    const f = {
+                        ...pageFilter,
+                        search: s
+                    };
+                    applyFilter(f)
+                }}
 
-                    onAdd={()=>{setOpenForm(true);}}
+                onAdd={()=>{setOpenForm(true);}}
 
-                    onOpenFilter={()=>{
-                        setIsFilter(true);
-                    }}
+                onOpenFilter={()=>{
+                    setIsFilter(true);
+                }}
 
-                />}
-        >
+            />
 
-            <div className='w-full overflow-auto'>
+            {!cars.total && <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    </div>
+                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    </div>
+                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    </div>
+                </div>
+                <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
+                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                </div>
+            </div>}
+
+            {cars.total && <div className='flex flex-1 h-full overflow-auto'>
                 <div className="py-3 grid lg:grid-cols-3 xl:grid-cols-4 grid-cols-1 gap-1">
                     <div className="sm:px-2 lg:px-3 box-border lg:col-span-2 xl:col-span-3 col-span-1">
                         <div className="shadow rounded-lg relative">
@@ -94,9 +125,9 @@ export default function Dashboard({ auth, carData }: PageProps<{ carData: CarRes
                                     onDelete={(id: number)=>{
                                         const car = cars.cars.filter((c) => c.id == id);
                                         if(car.length > 0){
-                                            window.axios.delete(route('api.cars.delete', {id}), {
+                                            axiosInstance.delete(deleteMethod(id).url, {
                                                 headers:{
-                                                    Authorization: `Bearer ${auth.apiToken}`
+                                                    Authorization: `Bearer ${props.auth.apiToken}`
                                                 },
                                                 data: car[0],
                                                 signal: abortController.current.control.signal
@@ -106,7 +137,7 @@ export default function Dashboard({ auth, carData }: PageProps<{ carData: CarRes
                                                     applyFilter(getFilter());
                                                 }
                                             }).catch((err) => {
-                                                // console.log({err})
+                                                console.log({err})
                                             });
                                         }
                                     }}
@@ -142,8 +173,7 @@ export default function Dashboard({ auth, carData }: PageProps<{ carData: CarRes
                         </FilterView>
                     </div>
                 </div>
-            </div>
-
+            </div>}
             {isFilter &&
                 <Modal show={isFilter} maxWidth='sm' onClose={()=>{setIsFilter(false)}}>
                     <FilterView
@@ -162,24 +192,24 @@ export default function Dashboard({ auth, carData }: PageProps<{ carData: CarRes
                     </FilterView>
                 </Modal>}
 
-            <Modal show={openForm} maxWidth='md' onClose={()=>{setOpenForm(false);}}>
-                <div style={{height: '80vh'}} className="overflow-auto">
-                    <FormCar
-                        car={editCar.current}
-                        onCancel={()=>{
-                            setOpenForm(false);
-                            editCar.current = null;
-                        }}
+                <Modal show={openForm} maxWidth='md' onClose={()=>{setOpenForm(false);}}>
+                    <div style={{height: '80vh'}} className="overflow-auto">
+                        <FormCar
+                            car={editCar.current}
+                            onCancel={()=>{
+                                setOpenForm(false);
+                                editCar.current = null;
+                            }}
 
-                        onSubmit={()=>{
-                            setOpenForm(false);
-                            editCar.current = null
+                            onSubmit={()=>{
+                                setOpenForm(false);
+                                editCar.current = null
 
-                            applyFilter(getFilter());
-                        }}/>
-                </div>
-            </Modal>
-        </AuthenticatedLayout>
-        </>
+                                applyFilter(getFilter());
+                            }}/>
+                    </div>
+                </Modal>
+        </AppLayout>
     );
 }
+
