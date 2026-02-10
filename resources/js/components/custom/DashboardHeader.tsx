@@ -13,7 +13,7 @@ export default function DashboardHeader({onSearch, onAdd=()=>{}, onOpenFilter=()
             <SearchBox onSearch={onSearch} value={f.search}/>
             <div className='mr-2' onClick={()=>onAdd()}>
                 <SecondaryButton className='hidden md:inline-flex dark:bg-gray-700 dark:text-gray-50 dark:border-gray-600'>Add Car</SecondaryButton>
-                <ActionButton className='block md:hidden dark:bg-gray-700 dark:text-gray-50 dark:border-gray-600' title='Add Car'>
+                <ActionButton className='block md:hidden dark:text-gray-50 dark:border-gray-600' title='Add Car'>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4 md:size-5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>

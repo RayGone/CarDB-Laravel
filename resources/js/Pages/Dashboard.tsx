@@ -66,7 +66,7 @@ export default function Dashboard() {
             console.log({err})
             setLoading(false)
         });
-    },[pageFilter]);
+    },[props.auth.apiToken, pageFilter]);
 
     function applyFilter(f: DataFilterModel){
         if(delayRef.current) clearTimeout(delayRef.current);
@@ -193,7 +193,7 @@ export default function Dashboard() {
                 </Modal>}
 
                 <Modal show={openForm} maxWidth='md' onClose={()=>{setOpenForm(false);}}>
-                    <div style={{height: '80vh'}} className="overflow-auto">
+                    <div style={{height: '80vh'}} className="overflow-auto dark:bg-gray-900">
                         <FormCar
                             car={editCar.current}
                             onCancel={()=>{

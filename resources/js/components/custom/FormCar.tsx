@@ -4,6 +4,7 @@ import { columnDef, emptyCar } from "@/model";
 import type { SharedData, Car } from "@/types";
 import PrimaryButton from "./PrimaryButton";
 import Spinner from "./Spinner";
+import axiosInstance from "@/bootstrap";
 
 function formValidation(state: Car){///, setter: (state: any)=>void){
     const required = columnDef.filter((col) => col.required);
@@ -42,17 +43,17 @@ function formValidation(state: Car){///, setter: (state: any)=>void){
 }
 
 export default function FormCar({car, onCancel=()=>{}, onSubmit= ()=>{}}: {car?: Car, onCancel?: ()=>void, onSubmit?: ()=>void}){
-    const { props }: any = usePage<SharedData>();
+    const { props } = usePage<SharedData>();
 
-    const [data, setData] = useState<any>(car ? car : emptyCar);
+    const [data, setData] = useState<Car>(car ? car : emptyCar);
     const [processing, setPost] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
     const errorMsg = useRef<ReactElement | null>(null);
 
     // const delayRef = useRef<any>(null);
-    const abortController = useRef<any>(null);
+    const abortController = useRef<AbortController>(null);
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = (e: MouseEvent) => {
         e.preventDefault();
         setIsError(false);
         if(!formValidation(data)){
@@ -74,7 +75,7 @@ export default function FormCar({car, onCancel=()=>{}, onSubmit= ()=>{}}: {car?:
         abortController.current = new AbortController();
 
         if(!car){
-            axios.post(endpiont, data, {
+            axiosInstance.post(endpiont, data, {
                 headers:{
                     Authorization: `Bearer ${props.auth.apiToken}`
                 },
@@ -97,9 +98,9 @@ export default function FormCar({car, onCancel=()=>{}, onSubmit= ()=>{}}: {car?:
             });
         }
         else{
-            window.axios.patch(endpiont, data, {
+            axiosInstance.patch(endpiont, data, {
                 headers:{
-                    Authorization: `Bearer ${auth.apiToken}`
+                    Authorization: `Bearer ${props.auth.apiToken}`
                 },
                 signal: abortController.current.signal
             }).then((res) => {
@@ -133,7 +134,7 @@ export default function FormCar({car, onCancel=()=>{}, onSubmit= ()=>{}}: {car?:
                     columnDef.map((col)=>
                         (col.key in data && col.key!='id') && <div key={col.key} className="flex flex-col space-y-1 pb-3 w-full">
                                 <label htmlFor={col.key}>{col.header}:</label>
-                                <input id={col.key} key={col.key} className="rounded w-full"
+                                <input id={col.key} key={col.key} className="rounded w-full border h-10 px-2 dark:border-slate-700"
                                     type={col.type}
                                     value={data[col.key] == -1 ? null : data[col.key]}
                                     required={col.required}

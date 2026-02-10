@@ -1,5 +1,5 @@
-import { Fragment, PropsWithChildren } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, DialogPanel, Transition, TransitionChild  } from '@headlessui/react';
+import { Fragment, type PropsWithChildren } from 'react';
 
 export default function Modal({
     children,
@@ -35,7 +35,7 @@ export default function Modal({
                 className="fixed inset-0 flex overflow-y-auto px-4 py-6 sm:px-0 items-center z-50 transform transition-all"
                 onClose={close}
             >
-                <Transition.Child
+                <TransitionChild
                     as={Fragment}
                     enter="ease-out duration-300"
                     enterFrom="opacity-0"
@@ -44,12 +44,12 @@ export default function Modal({
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="absolute inset-0 bg-gray-500/75">
-                        <span className='float-right text-lg m-2 py-1 px-5 font-bolder cursor-pointer text-red-300 border rounded'>x</span>
+                    <div className="absolute inset-0 bg-gray-500/75 z-100 select-none">
+                        <span className='float-right text-lg w-8 h-8 font-bolder cursor-pointer flex items-center justify-center hover:bg-red-500 text-red-50 border rounded-full'>x</span>
                     </div>
-                </Transition.Child>
+                </TransitionChild>
 
-                <Transition.Child
+                <TransitionChild
                     as={Fragment}
                     enter="ease-out duration-300"
                     enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
@@ -58,12 +58,12 @@ export default function Modal({
                     leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                     leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 >
-                    <Dialog.Panel
-                        className={`mb-6 bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full mx-auto ${maxWidthClass}`}
+                    <DialogPanel
+                        className={`z-101 mb-6 bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full mx-auto ${maxWidthClass}`}
                     >
                         {children}
-                    </Dialog.Panel>
-                </Transition.Child>
+                    </DialogPanel>
+                </TransitionChild>
             </Dialog>
         </Transition>
     );
