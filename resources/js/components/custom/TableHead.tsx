@@ -14,7 +14,7 @@ interface TableHeadPropTypes{
 
 export default function TableHead({headDef, action, sort={order:'asc',orderBy:'id'}, onSort=(sort: Sort)=>{}}: TableHeadPropTypes){
     return <thead className='sticky-head'>
-        <tr className='group bg-white dark:bg-slate-900 shadow-down cursor-pointer border-2 dark:border-slate-700 border-separate'>
+        <tr className='group bg-white dark:bg-slate-900 shadow-down cursor-pointer dark:border-slate-700'>
             {
                 headDef.map((col: Column) => {
                     return <th key={col.key} className='px-3 py-2 text-sm'
@@ -57,7 +57,7 @@ export default function TableHead({headDef, action, sort={order:'asc',orderBy:'i
             }
 
             {
-                (action) && <th className='px-4 py-2 border-2 bg-white dark:bg-slate-900 dark:border-slate-700 sticky-right font-thin text-sm'>
+                (action) && <th className='px-4 py-2 sticky-right font-thin text-sm bg-inherit'>
                     Action
                 </th>
             }

@@ -1,5 +1,5 @@
 import { Head, usePage } from '@inertiajs/react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import axiosInstance from '@/bootstrap';
 
 import DashboardHeader from '@/components/custom/DashboardHeader';
@@ -7,13 +7,16 @@ import FilterView from '@/components/custom/FilterView';
 import FormCar from '@/components/custom/FormCar';
 import Modal from '@/components/custom/Modal';
 import Table from '@/components/custom/Table';
-
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+
+import {useFetchApiToken} from '@/hooks';
+import useFetchTableData from '@/hooks/use-fetch-table-data';
+
 import AppLayout from '@/layouts/app-layout';
-import {getFilter, setFilter, isInitFilter} from "@/model";
+import {getFilter, setFilter} from "@/model";
 import { dashboard } from '@/routes';
-import { deleteMethod, getbyfilter } from '@/routes/api/cars';
-import { type SharedData, type BreadcrumbItem, type CarResponse, type DataFilterModel } from '@/types';
+import { deleteMethod } from '@/routes/api/cars';
+import type { BreadcrumbItem, DataFilterModel } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,51 +25,16 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const emptyResponse = {cars: [], total:0}
-
 export default function Dashboard() {
-    const { props } = usePage<SharedData>();
+    const [apiToken] = useFetchApiToken();
+    const {cars, loading, pageFilter, setPageFilter} = useFetchTableData()
 
-    const [cars, setCars] = useState<CarResponse>(emptyResponse);
-    const [pageFilter, setPageFilter] = useState<DataFilterModel>(getFilter());
-    const [loading, setLoading] = useState<boolean>(false);
     const [isFilter, setIsFilter] = useState<boolean>(false);
     const [openForm, setOpenForm] = useState<boolean>(false);
 
-    const delayRef = useRef<any>(null);
-    const abortController = useRef<any>({control: null});
-    const editCar = useRef<any>(null);
-
-    useEffect(() => {
-        if(isInitFilter(pageFilter)) {
-            // setCars(carData);
-            // return;
-        }
-
-        setLoading(true);
-        if (abortController?.current?.control) {
-            abortController.current.control.abort();
-        }
-
-        abortController.current.control = new AbortController();
-
-        console.log(getbyfilter().url)
-        axiosInstance.post(getbyfilter().url ,pageFilter, {
-            headers:{
-                Authorization: `Bearer ${props.auth.apiToken}`
-            },
-            signal: abortController.current.control.signal
-        }).then((res) => {
-            if(res.data.status == 'success'){
-                const response: CarResponse = res.data.data;
-                setCars(response);
-                setLoading(false);
-            }
-        }).catch((err) => {
-            console.log({err})
-            setLoading(false)
-        });
-    },[props.auth.apiToken, pageFilter]);
+    const delayRef = useRef<number | undefined>(null);
+    const abortController = useRef<{control: AbortController | null }>({control: null});
+    const editCar = useRef<number | null>(null);
 
     function applyFilter(f: DataFilterModel){
         if(delayRef.current) clearTimeout(delayRef.current);
@@ -98,7 +66,7 @@ export default function Dashboard() {
 
             />
 
-            {!cars.total && <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            {(!cars.total && !loading) && <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                     <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
@@ -115,7 +83,7 @@ export default function Dashboard() {
                 </div>
             </div>}
 
-            {cars.total && <div className='flex flex-1 h-full overflow-auto'>
+            <div className='flex flex-1 h-full overflow-auto'>
                 <div className="py-3 grid lg:grid-cols-3 xl:grid-cols-4 grid-cols-1 gap-1">
                     <div className="sm:px-2 lg:px-3 box-border lg:col-span-2 xl:col-span-3 col-span-1">
                         <div className="shadow rounded-lg relative">
@@ -127,12 +95,12 @@ export default function Dashboard() {
                                         if(car.length > 0){
                                             axiosInstance.delete(deleteMethod(id).url, {
                                                 headers:{
-                                                    Authorization: `Bearer ${props.auth.apiToken}`
+                                                    Authorization: `Bearer ${apiToken}`
                                                 },
                                                 data: car[0],
-                                                signal: abortController.current.control.signal
+                                                signal: abortController.current?.control.signal
                                             }).then((res) => {
-                                                console.log(res.data);
+                                                // console.log(res.data);
                                                 if(res.data.status == 'success'){
                                                     applyFilter(getFilter());
                                                 }
@@ -165,15 +133,18 @@ export default function Dashboard() {
                             }}
 
                             onRemove={(f)=>{
-                                pageFilter.filter = pageFilter.filter.filter((r)=> !(r.field==f.field && r.ops==f.ops && r.value==f.value));
-                                applyFilter(pageFilter)
+                                const filter = {
+                                    ...pageFilter,
+                                    filter: pageFilter.filter.filter((r)=> !(r.field==f.field && r.ops==f.ops && r.value==f.value))
+                                }
+                                applyFilter(filter)
                             }}
                         >
                             <span className='p-2 text-l'>No Filter Set.</span>
                         </FilterView>
                     </div>
                 </div>
-            </div>}
+            </div>
             {isFilter &&
                 <Modal show={isFilter} maxWidth='sm' onClose={()=>{setIsFilter(false)}}>
                     <FilterView
@@ -184,8 +155,11 @@ export default function Dashboard() {
                         }}
 
                         onRemove={(f)=>{
-                            pageFilter.filter = pageFilter.filter.filter((r)=> !(r.field==f.field && r.ops==f.ops && r.value==f.value));
-                            applyFilter(pageFilter)
+                            const filter = {
+                                ...pageFilter,
+                                filter: pageFilter.filter.filter((r)=> !(r.field==f.field && r.ops==f.ops && r.value==f.value))
+                            }
+                            applyFilter(filter)
                         }}
                     >
                         <span className='p-2 text-l'>No Filter Set.</span>

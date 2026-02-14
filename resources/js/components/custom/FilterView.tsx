@@ -31,7 +31,7 @@ export function FilterComponent({filter, onRemove}: {filter: FilterModel, onRemo
  * AddFilter Component
  * @returns React.FunctionalComponent
  */
-export function AddFilter({onClose, onAdd}: {onAdd: (f: FilterModel)=>void, onClose: (e?: any)=>void}){
+export function AddFilter({onClose, onAdd}: {onAdd: (f: FilterModel)=>void, onClose: (e)=>void}){
     function filterAddReducer(state: FilterModel, action: Partial<FilterModel>): FilterModel{
         return {
             ...state,
@@ -78,7 +78,7 @@ export function AddFilter({onClose, onAdd}: {onAdd: (f: FilterModel)=>void, onCl
             </select>
 
             <label htmlFor='value'  className="text-sm font-thin">Value</label>
-            <input id='value' value={addFilterState.value} min={0} type='number' className='rounded py-2 mb-3' placeholder='Value' aria-placeholder='Value' onChange={(e)=>{addFilterDispatcher({value: e.target.value})}}/>
+            <input id='value' value={addFilterState.value} min={0} type='number' className='border rounded p-2 mb-3' placeholder='Value' aria-placeholder='Value' onChange={(e)=>{addFilterDispatcher({value: e.target.value})}}/>
         </div>
         <div className='flex flex-col justify-around ml-2'>
             <ActionButton onClick={()=>handleAdd()}>

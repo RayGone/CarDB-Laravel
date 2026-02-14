@@ -37,19 +37,12 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
-        $token = "";
-        if($user){
-            $user = User::find($request->user()['id']);
-            $user->tokens()->delete();
-            $token = $user->createToken('Access Token')->plainTextToken;
-        }
 
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $user = $request->user(),
-                'apiToken' => $token
+                'user' => $user
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

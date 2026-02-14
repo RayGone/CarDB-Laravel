@@ -9,9 +9,6 @@ use Exception;
 use RuntimeException;
 use Illuminate\Http\Request;
 use App\Exports\CarsExport;
-use App\Enums\CarsAttributeEnum;
-use App\Models\Cars;
-use Illuminate\Support\Facades\DB;
 
 class CarsController extends Controller
 {
@@ -141,33 +138,5 @@ class CarsController extends Controller
         }else{
             throw new RuntimeException("Unrecognized / Unacceptable File Type!!");
         }
-    }
-
-
-    public function modelPerYear(Request $request){
-        // Log::debug("GET/POST Request Data",$request->all());
-        $param = $request->all();
-        $brand = in_array("brand", array_keys($param)) ? $param["brand"]  : '';
-
-        $query = Cars::select(CarsAttributeEnum::MODEL_YEAR->value, CarsAttributeEnum::ORIGIN->value, DB::raw('count(*) as count'))
-            ->groupBy(CarsAttributeEnum::MODEL_YEAR->value, CarsAttributeEnum::ORIGIN->value)->orderBy(CarsAttributeEnum::MODEL_YEAR->value);
-
-
-        $brand = strtolower($brand);
-        if(!(is_null($brand) || $brand==="all")){
-            $c = CarsAttributeEnum::NAME->value;
-            Log::debug("Where Query Added", [$c, $brand]);
-            $query = $query->whereRaw("LOWER($c) ILIKE ?", ["{$brand}%"]);
-        }
-
-        $data = $query->get();
-        return $data;
-    }
-
-    public function countModelCylinderPerYear(Request $request){
-        $years = $this->carsRepository->listModelYears();
-        return [
-            "years" => $years
-        ];
     }
 }

@@ -2,7 +2,7 @@ import { type ImgHTMLAttributes } from "react";
 
 export default function AppLogoIcon(props: ImgHTMLAttributes<HTMLImageElement>) {
     return (
-        <img src="/thumbnail.png" alt="Logo Icon" {...props} />
+        <img src="/fav.jpg" alt="Logo Icon" {...props} />
     );
 
     {/*<svg {...props} viewBox="0 0 40 42" xmlns="http://www.w3.org/2000/svg">

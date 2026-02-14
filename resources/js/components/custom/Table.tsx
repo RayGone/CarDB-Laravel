@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { columnDef, getFilter } from '@/model';
 
 import type { Car, CarResponse, DataFilterModel } from '@/types';
@@ -14,21 +14,41 @@ interface TableComponentProps {
 }
 
 export default function Table({data, onFilter, onEdit, onDelete, loading=false}: TableComponentProps){
-    const f = useRef<DataFilterModel>(getFilter());
-    const from = f.current?.page * f.current.limit;
-    const to = from+data.cars.length;
-    const maxPage = Math.ceil(data.total/f.current.limit) - 1;
+    const f = getFilter();
+    const from = f?.page * f.limit;
+
+    const [paginationState, setPaginationState] = useState({
+            from: from,
+            to: from+data.cars.length,
+            page: f.page,
+            maxPage: Math.ceil(data.total/f.limit) - 1
+        });
+
+    useEffect(() => {
+        const f = getFilter();
+
+        const from = f?.page * f.limit
+        setTimeout(()=>{
+        setPaginationState({
+            from: from,
+            to: from+data.cars.length,
+            maxPage: Math.ceil(data.total/f.limit) - 1,
+            page: f.page
+        });
+        }, 1)
+    }, [data])
 
     return (
         <>
-            <table className="bg-white dark:bg-slate-800 min-w-full table-auto text-xs md:text-sm lg:text-base">
+            <table className="bg-white dark:bg-slate-800 min-w-full table-auto border-collapse text-xs md:text-sm lg:text-base">
                 <TableHead headDef={columnDef} action={true}
-                    sort={{order: f.current.order, orderBy:f.current.orderBy}}
+                    sort={{order: f.order, orderBy:f.orderBy}}
                     onSort={
                         (sort) => {
-                            f.current.order = sort.order;
-                            f.current.orderBy = sort.orderBy;
-                            onFilter(f.current);
+                            const f = getFilter();
+                            f.order = sort.order;
+                            f.orderBy = sort.orderBy;
+                            onFilter(f);
                         }
                     }/>
 
@@ -48,14 +68,14 @@ export default function Table({data, onFilter, onEdit, onDelete, loading=false}:
                     }
                     {
                         data.cars.map((car: Car)=>{
-                            return <tr key={car.id} className='bg-background'>
+                            return <tr key={car.id} className='odd:bg-background even:bg-gray-200 dark:even:bg-gray-800'>
                                 {
-                                    columnDef.map((col) => <td key={col.key} className="border-1 dark:border-slate-500 px-4 py-2">
+                                    columnDef.map((col) => <td key={col.key} className="px-2 py-1">
                                         {car[col.key]}
                                     </td>)
 
                                 }
-                                <td className="px-4 py-2 bg-background sticky-right z-5 border-1 dark:border-slate-500">
+                                <td className="px-4 py-2 sticky-right bg-inherit">
                                     <div className='flex flex-row dark:border-slate-700'>
                                         <button key='Edit' className='hover:bg-blue-50 dark:hover:bg-blue-900 text-gray dark:text-gray-50 font-bold py-3 px-3 rounded-full' onClick={()=>{onEdit(car.id as number)}}>
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4 md:size-5">
@@ -82,12 +102,13 @@ export default function Table({data, onFilter, onEdit, onDelete, loading=false}:
                                         <div className='mb-1'>
                                             <span className='px-3 font-light'>Rows Per Page</span>
                                             <select id="options"
-                                                value={f.current.limit}
+                                                value={f.limit}
                                                 className="w-20 mt-1 p-2 bg-white dark:bg-gray-800 border border-gray-300 rounded-md text-xs md:text-sm
                                                         shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                                 onChange={(e)=>{
-                                                    f.current.limit = parseInt(e.target.value);
-                                                    onFilter(f.current);
+                                                    const f = getFilter();
+                                                    f.limit = parseInt(e.target.value);
+                                                    onFilter(f);
                                                 }}
                                                 >
                                                     <option value={10} className='text-xs md:text-sm'>10</option>
@@ -97,38 +118,41 @@ export default function Table({data, onFilter, onEdit, onDelete, loading=false}:
                                             </select>
                                         </div>
                                         <div className='mb-1'>
-                                            &nbsp;&nbsp; Showing: {from} to {to} of {data.total} &nbsp;&nbsp;
+                                            &nbsp;&nbsp; Showing: {paginationState.from} to {paginationState.to} of {data.total} &nbsp;&nbsp;
                                             <ul className="inline-flex items-center -space-x-px">
                                                 <li>
                                                     <a href="#"
                                                         onClick={()=>{
-                                                            if(f.current.page == 0) return;
-                                                            f.current.page--;
+                                                            const f = getFilter();
+                                                            if(f.page == 0) return;
+                                                            f.page--;
 
-                                                            if(f.current.page > maxPage) f.current.page = maxPage;
-                                                            onFilter(f.current);
+                                                            if(f.page > paginationState.maxPage) f.page = paginationState.maxPage;
+                                                            onFilter(f);
                                                         }}
                                                         className="py-2 px-3 leading-tight text-gray-600 dark:text-gray-200 bg-white dark:bg-gray-800 rounded-l-lg border border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900/30 hover:text-gray-700 dark:hover:text-gray-300">Prev</a>
                                                 </li>
                                                 <li>
                                                     <input className="px-3 min-w-16 md:min-w-20 py-1.5 text-gray-600 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300
                                                                         hover:bg-gray-100 dark:hover:bg-gray-900/30 hover:text-gray-700 dark:hover:text-gray-300 text-xs md:text-sm"
-                                                        style={{width:"60px"}} value={f.current.page} max={maxPage} min={0} type={'number'}
+                                                        style={{width:"60px"}} value={paginationState.page} max={paginationState.maxPage} min={0} type={'number'}
                                                         onChange={(e)=>{
+                                                            const f = getFilter();
                                                             const v = e.target.value ? parseInt(e.target.value) : 0
-                                                            const value = v > maxPage ? maxPage: v;
+                                                            const value = v > paginationState.maxPage ? paginationState.maxPage: v;
 
-                                                            f.current.page = value;
-                                                            onFilter(f.current);
+                                                            f.page = value;
+                                                            onFilter(f);
                                                         }}
                                                     />
                                                 </li>
                                                 <li>
                                                     <a href="#"
                                                         onClick={()=>{
-                                                            f.current.page++;
-                                                            if(f.current.page > maxPage) f.current.page = maxPage;
-                                                            onFilter(f.current);
+                                                            const f = getFilter();
+                                                            f.page++;
+                                                            if(f.page > paginationState.maxPage) f.page = paginationState.maxPage;
+                                                            onFilter(f);
                                                         }}
                                                         className="py-2 px-3 leading-tight text-gray-600 dark:text-gray-200 bg-white dark:bg-gray-800  rounded-r-lg border border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900/30 hover:text-gray-700 dark:hover:text-gray-300">Next</a>
                                                 </li>

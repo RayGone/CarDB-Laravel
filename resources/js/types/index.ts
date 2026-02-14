@@ -71,3 +71,10 @@ export interface Car {
     page: number;
   }
 
+
+
+  export interface ApiChartResponse{
+      model_year: string,
+      origin: string,
+      count: number
+  }
