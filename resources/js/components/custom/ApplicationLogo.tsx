@@ -1,7 +1,10 @@
 import { SVGAttributes } from 'react';
 
-export default function ApplicationLogo({className}: {className?: string}) {
+export default function ApplicationLogo({ className }: { className?: string }) {
     return (
-        <img src={'/thumbnail.png'} className={'rounded-full w-32 fill-current' + className} />
+        <img
+            src={'/thumbnail.png'}
+            className={'w-32 rounded-full fill-current' + className}
+        />
     );
 }

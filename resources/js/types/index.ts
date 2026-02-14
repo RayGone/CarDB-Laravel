@@ -18,7 +18,9 @@ export interface User {
     email_verified_at: string;
 }
 
-export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+export type PageProps<
+    T extends Record<string, unknown> = Record<string, unknown>,
+> = T & {
     auth: {
         user: User;
         apiToken: string;
@@ -37,44 +39,42 @@ export interface Car {
     cylinders?: number;
     displacement?: number;
     // [key: string]: string | number | boolean;
-  }
+}
 
-  export interface CarResponse {
+export interface CarResponse {
     cars: Car[];
     total: number;
-  }
+}
 
-  export interface Column{
+export interface Column {
     key: string;
     header: string;
     type: string;
     required: boolean;
-  }
+}
 
-  export interface OP{
+export interface OP {
     key: string;
     value: string;
-  }
+}
 
-  export interface FilterModel{
+export interface FilterModel {
     field: string;
     ops: string;
     value: string;
-  }
+}
 
-  export interface DataFilterModel{
+export interface DataFilterModel {
     filter: FilterModel[];
     limit: number;
     order: string;
     orderBy: string;
     search: string;
     page: number;
-  }
+}
 
-
-
-  export interface ApiChartResponse{
-      model_year: string,
-      origin: string,
-      count: number
-  }
+export interface ApiChartResponse {
+    model_year: string;
+    origin: string;
+    count: number;
+}

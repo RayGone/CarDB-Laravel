@@ -7,11 +7,11 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-                    baseURL: import.meta.env.APP_URL, // Replace with your API base URL
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
+    baseURL: import.meta.env.APP_URL, // Replace with your API base URL
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
 
 axiosInstance.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 

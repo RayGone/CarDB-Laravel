@@ -141,38 +141,36 @@
     }
 }
 
-
-.sticky-head{
+.sticky-head {
     position: -webkit-sticky;
     position: sticky;
     top: -2px;
-    z-index:11;
+    z-index: 11;
 }
 
-.sticky-right{
+.sticky-right {
     position: -webkit-sticky;
     position: sticky;
-    right:-2px;
-    z-index:10;
-    box-shadow: "-1px 0 2px gray"
+    right: -2px;
+    z-index: 10;
+    box-shadow: '-1px 0 2px gray';
 }
 
-
-.sticky-foot{
+.sticky-foot {
     position: -webkit-sticky;
     position: sticky;
     bottom: -2px;
-    z-index:11;
+    z-index: 11;
 }
 
-.shadow-up{
+.shadow-up {
     box-shadow: 0 -1px 5px #cccccc99;
 }
 
-.shadow-down{
+.shadow-down {
     box-shadow: 0 2px 5px #cccccc88;
 }
 
-.shadow-left{
+.shadow-left {
     box-shadow: -3px 0px 5px #cccccc;
 }
