@@ -77,9 +77,9 @@ jobs:
             **/.git*/**
             **/node_modules/**
             **/favicon.ico
-            **/resources/**
             **/tests/**
             **/stubs/**
             **/database/**
             **/vendor/**
+            # **/resources/js/**
 
