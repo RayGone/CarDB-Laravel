@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/react-starter-kit",
+    "name": "rgx/laracar",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "A simple Laravel/React dashboard project.",
     "keywords": [
         "laravel",
         "framework"
