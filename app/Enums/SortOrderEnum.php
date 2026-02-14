@@ -1,11 +1,13 @@
 <?php
+
 namespace App\Enums;
 
 use UnexpectedValueException;
 
-enum SortOrderEnum: string{
-    case ASC = "asc";
-    case DESC = "desc";
+enum SortOrderEnum: string
+{
+    case ASC = 'asc';
+    case DESC = 'desc';
 
     // public static function mapFrom($order){
     //     switch($order){
@@ -18,4 +20,3 @@ enum SortOrderEnum: string{
     //     }
     // }
 }
-?>

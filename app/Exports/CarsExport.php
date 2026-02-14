@@ -3,14 +3,12 @@
 namespace App\Exports;
 
 use App\Models\Cars;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-class CarsExport implements FromCollection, WithHeadings, WithMapping
+
+class CarsExport
 {
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         return Cars::all();
@@ -19,7 +17,7 @@ class CarsExport implements FromCollection, WithHeadings, WithMapping
     public function headings(): array
     {
         return [
-            "ID", "Name", "Origin", "Model Year", "Acceleration", "Horsepower", "MPG", "Weight", "Cylinders", "Displacement"
+            'ID', 'Name', 'Origin', 'Model Year', 'Acceleration', 'Horsepower', 'MPG', 'Weight', 'Cylinders', 'Displacement',
         ];
     }
 
@@ -35,11 +33,24 @@ class CarsExport implements FromCollection, WithHeadings, WithMapping
             $cars->mpg,
             $cars->weight,
             $cars->cylinders,
-            $cars->displacement
+            $cars->displacement,
         ];
     }
 
-    public function toJson(){
+    public function toCsv()
+    {
+        $cars = $this->collection();
+
+        $csv = implode(',', $this->headings());
+        foreach ($cars as $car) {
+            $csv .= "\r\n".implode(',', $this->map($car));
+        }
+
+        return $csv;
+    }
+
+    public function toJson()
+    {
         return $this->collection()->toJson();
     }
 }

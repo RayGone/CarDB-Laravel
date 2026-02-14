@@ -3,12 +3,13 @@
 namespace App\Repositories;
 
 use App\Dtos\CarDto;
-use App\Models\Cars;
 use App\Dtos\FilterModel;
 use App\Enums\CarsAttributeEnum;
+use App\Models\Cars;
 
-class CarsRepository{
-    public function __construct(){}
+class CarsRepository
+{
+    public function __construct() {}
 
     public function query(array $filterModel)
     {
@@ -16,17 +17,16 @@ class CarsRepository{
 
         $query = Cars::orderBy($filterModel->orderBy->value, $filterModel->order->value);
 
-        if(strlen($filterModel->search > 0)){
-            $query = $query->where((CarsAttributeEnum::NAME)->value, 'LIKE',  "%{$filterModel->search}%")
-                            ->orWhere((CarsAttributeEnum::ORIGIN)->value, 'LIKE',  "%{$filterModel->search}%");
+        if (strlen($filterModel->search > 0)) {
+            $query = $query->where((CarsAttributeEnum::NAME)->value, 'LIKE', "%{$filterModel->search}%")
+                ->orWhere((CarsAttributeEnum::ORIGIN)->value, 'LIKE', "%{$filterModel->search}%");
         }
 
-
-        if(count($filterModel->filters) > 0){
+        if (count($filterModel->filters) > 0) {
             $filter = array_shift($filterModel->filters);
             $query = $query->where($filter->getField(), $filter->getOps(), $filter->getValue());
 
-            foreach($filterModel->filters as $filter){
+            foreach ($filterModel->filters as $filter) {
                 $query = $query->where($filter->getField(), $filter->getOps(), $filter->getValue());
             }
         }
@@ -34,9 +34,10 @@ class CarsRepository{
 
         $query = $query->skip(($filterModel->page * $filterModel->limit))->take($filterModel->limit);
         $cars = $query->get();
+
         return [
-            "cars" => $cars,
-            "total" => $total
+            'cars' => $cars,
+            'total' => $total,
         ];
 
         // $paginate = Cars::paginate($this->def_pageSize);
@@ -54,14 +55,16 @@ class CarsRepository{
     public function addCar(array $car)
     {
         $dto = (new CarDto($car))->toArray();
-        $oldCar = Cars::where(CarsAttributeEnum::NAME->value,$dto['name'])->where("origin",$dto['origin'])->where("model_year",$dto['model_year'])->get();
-        if(count($oldCar))
+        $oldCar = Cars::where(CarsAttributeEnum::NAME->value, $dto['name'])->where('origin', $dto['origin'])->where('model_year', $dto['model_year'])->get();
+        if (count($oldCar)) {
             return $oldCar;
+        }
 
         // var_dump($oldCar);
 
         unset($dto['id']);
         $newCar = Cars::create($dto);
+
         return $newCar;
     }
 
@@ -73,6 +76,7 @@ class CarsRepository{
         unset($dto['id']);
         $cars->fill($dto);
         $cars->save();
+
         return $cars;
     }
 
@@ -82,8 +86,9 @@ class CarsRepository{
         $dto1 = (new CarDto($dbCar->toArray()))->toArray();
         $dto2 = (new CarDto($car))->toArray();
 
-        if(json_encode($dto1) == json_encode($dto2))
+        if (json_encode($dto1) == json_encode($dto2)) {
             $dbCar->delete();
+        }
 
         return $dto1;
     }
@@ -91,7 +96,10 @@ class CarsRepository{
     public function listModelYears()
     {
         $years = Cars::distinct()->get(CarsAttributeEnum::MODEL_YEAR->value)->toArray();
-        $r = array_map(function($i){return $i[CarsAttributeEnum::MODEL_YEAR->value];}, $years);
+        $r = array_map(function ($i) {
+            return $i[CarsAttributeEnum::MODEL_YEAR->value];
+        }, $years);
+
         return $r;
     }
 
@@ -99,13 +107,13 @@ class CarsRepository{
     {
         $brands = [];
         $names = Cars::get(CarsAttributeEnum::NAME->value)->toArray();
-        foreach($names as $name){
-            $brand = explode(" ", $name[CarsAttributeEnum::NAME->value])[0];
-            if(!in_array($brand, $brands)){
+        foreach ($names as $name) {
+            $brand = explode(' ', $name[CarsAttributeEnum::NAME->value])[0];
+            if (! in_array($brand, $brands)) {
                 array_push($brands, $brand);
             }
         }
+
         return $brands;
     }
 }
-?>

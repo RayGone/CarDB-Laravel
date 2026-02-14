@@ -1,21 +1,21 @@
 <?php
+
 namespace App\Enums;
 
 use UnexpectedValueException;
 
-enum CarsAttributeEnum: string{
-    case ID = "id";
-    case NAME = "name";
-    case ORIGIN = "origin";
-    case MODEL_YEAR = "model_year";
-    case ACCELERATION = "acceleration";
-    case HORSEPOWER = "horsepower";
-    case MPG = "mpg";
-    case WEIGHT = "weight";
-    case CYLINDERS = "cylinders";
-    case DISPLACEMENT = "displacement";
-
-
+enum CarsAttributeEnum: string
+{
+    case ID = 'id';
+    case NAME = 'name';
+    case ORIGIN = 'origin';
+    case MODEL_YEAR = 'model_year';
+    case ACCELERATION = 'acceleration';
+    case HORSEPOWER = 'horsepower';
+    case MPG = 'mpg';
+    case WEIGHT = 'weight';
+    case CYLINDERS = 'cylinders';
+    case DISPLACEMENT = 'displacement';
 
     // public static function mapFrom($attr){
     //     switch($attr){
@@ -44,5 +44,3 @@ enum CarsAttributeEnum: string{
     //     }
     // }
 }
-
-?>

@@ -2,21 +2,28 @@
 
 namespace App\Dtos;
 
-use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
-use Illuminate\Support\Facades\Date;
 use RuntimeException;
 
 class CarDto
 {
     private ?int $id = null;
+
     private string $name;
+
     private string $origin;
+
     private string $model_year;
+
     private ?float $acceleration = null;
+
     private ?float $horsepower = null;
+
     private ?float $mpg = null;
+
     private ?float $weight = null;
+
     private ?int $cylinders = null;
+
     private ?float $displacement = null;
 
     public function __construct(array $param)
@@ -32,6 +39,7 @@ class CarDto
     public function setId(?int $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -43,6 +51,7 @@ class CarDto
     public function setName(string $name): self
     {
         $this->name = strtolower(trim($name));
+
         return $this;
     }
 
@@ -54,6 +63,7 @@ class CarDto
     public function setOrigin(string $origin): self
     {
         $this->origin = strtolower(trim($origin));
+
         return $this;
     }
 
@@ -64,7 +74,8 @@ class CarDto
 
     public function setModel_year(string $model_year): self
     {
-        $this->model_year = !!$model_year ? $model_year : date("Y:m:d");
+        $this->model_year = (bool) $model_year ? $model_year : date('Y:m:d');
+
         return $this;
     }
 
@@ -76,6 +87,7 @@ class CarDto
     public function setAcceleration(?float $acceleration): self
     {
         $this->acceleration = $acceleration;
+
         return $this;
     }
 
@@ -87,6 +99,7 @@ class CarDto
     public function setHorsepower(?float $horsepower): self
     {
         $this->horsepower = $horsepower;
+
         return $this;
     }
 
@@ -98,6 +111,7 @@ class CarDto
     public function setMpg(?float $mpg): self
     {
         $this->mpg = $mpg;
+
         return $this;
     }
 
@@ -109,6 +123,7 @@ class CarDto
     public function setWeight(?float $weight): self
     {
         $this->weight = $weight;
+
         return $this;
     }
 
@@ -120,6 +135,7 @@ class CarDto
     public function setCylinders(?int $cylinders): self
     {
         $this->cylinders = $cylinders;
+
         return $this;
     }
 
@@ -131,6 +147,7 @@ class CarDto
     public function setDisplacement(?float $displacement): self
     {
         $this->displacement = $displacement;
+
         return $this;
     }
 
@@ -139,15 +156,21 @@ class CarDto
         if (isset($data['id'])) {
             $this->setId($data['id']);
         }
-        if (isset($data['name']) && trim($data['name'])!="") {
+        if (isset($data['name']) && trim($data['name']) != '') {
             $this->setName($data['name']);
-        } else throw new RuntimeException("Required Field Missing / Empty. name is missing.");
-        if (isset($data['origin']) && trim($data['origin'])!="") {
+        } else {
+            throw new RuntimeException('Required Field Missing / Empty. name is missing.');
+        }
+        if (isset($data['origin']) && trim($data['origin']) != '') {
             $this->setOrigin($data['origin']);
-        } else throw new RuntimeException("Required Field Missing / Empty. origin is missing.");
-        if (isset($data['model_year']) && trim($data['model_year'])!="") {
+        } else {
+            throw new RuntimeException('Required Field Missing / Empty. origin is missing.');
+        }
+        if (isset($data['model_year']) && trim($data['model_year']) != '') {
             $this->setModel_year($data['model_year']);
-        } else throw new RuntimeException("Required Field Missing / Invalid. model_year is missing / invalid.");
+        } else {
+            throw new RuntimeException('Required Field Missing / Invalid. model_year is missing / invalid.');
+        }
         if (isset($data['acceleration'])) {
             $this->setAcceleration($data['acceleration']);
         }
@@ -182,11 +205,11 @@ class CarDto
             'mpg' => $this->getMpg(),
             'weight' => $this->getWeight(),
             'cylinders' => $this->getCylinders(),
-            'displacement' => $this->getDisplacement()
+            'displacement' => $this->getDisplacement(),
         ];
     }
 
-    public function carAttributes(array $exclude=[]): array
+    public function carAttributes(array $exclude = []): array
     {
         $array = $this->toArray();
 

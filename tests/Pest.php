@@ -1,9 +1,5 @@
 <?php
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase; //Don't use Refresh Database on Production, it wipes out all the data.
-use Tests\TestCase;
-
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,11 +7,13 @@ use Tests\TestCase;
 |
 | The closure you provide to your test functions is always bound to a specific PHPUnit test
 | case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
-| need to change it using the "uses()" function to bind a different classes or traits.
+| need to change it using the "pest()" function to bind a different classes or traits.
 |
 */
 
-uses(TestCase::class, DatabaseTransactions::class)->in('Feature');
+pest()->extend(Tests\TestCase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->in('Feature');
 
 /*
 |--------------------------------------------------------------------------
