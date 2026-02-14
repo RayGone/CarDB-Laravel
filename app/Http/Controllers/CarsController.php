@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Log;
-
+use App\Exports\CarsExport;
 use App\Repositories\CarsRepository;
 use Exception;
-use RuntimeException;
 use Illuminate\Http\Request;
-use App\Exports\CarsExport;
+use RuntimeException;
 
 class CarsController extends Controller
 {
     protected $carsRepository;
+
     protected $rule = [
         'id' => 'nullable|numeric|min:0',
         'name' => 'required|string|max:255',
@@ -30,23 +29,25 @@ class CarsController extends Controller
     {
         $this->carsRepository = $carsRepository;
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        try{
+        try {
             $query = $request->all();
             $cars = $this->carsRepository->query($query);
+
             return response()->json([
-                "status"=>"success",
-                "data"=>$cars
+                'status' => 'success',
+                'data' => $cars,
             ], 200);
-        } catch(Exception $e){
+        } catch (Exception $e) {
             return response()->json([
-                "status"=>"error",
-                "message"=>"Server Error: ".$e->getMessage(),
-                "data" => []
+                'status' => 'error',
+                'message' => 'Server Error: '.$e->getMessage(),
+                'data' => [],
             ], 500);
         }
     }
@@ -60,8 +61,8 @@ class CarsController extends Controller
         $car = $this->carsRepository->addCar($validated);
 
         return response()->json([
-            "status"=>"success",
-            "created"=> $car]);
+            'status' => 'success',
+            'created' => $car]);
     }
 
     /**
@@ -70,16 +71,17 @@ class CarsController extends Controller
     public function show(int $id)
     {
         $car = $this->carsRepository->queryOne($id);
-        if($car)
+        if ($car) {
             return response()->json([
-                "status" => "success",
-                "data" => $car
+                'status' => 'success',
+                'data' => $car,
             ], 200);
-        else
+        } else {
             return response()->json([
-                "status" => "not-found",
-                "data" => $car
+                'status' => 'not-found',
+                'data' => $car,
             ], 404);
+        }
     }
 
     /**
@@ -89,15 +91,15 @@ class CarsController extends Controller
     {
         $validated = $request->validate($this->rule);
 
-        if($id != $validated['id']){
+        if ($id != $validated['id']) {
             throw new RuntimeException("Car doesn't Exist.");
         }
 
         $car = $this->carsRepository->editCar($validated, $id);
 
         return response()->json([
-            "status"=>"success",
-            "edited"=> $car]);
+            'status' => 'success',
+            'edited' => $car]);
     }
 
     /**
@@ -109,34 +111,37 @@ class CarsController extends Controller
 
         $car = $this->carsRepository->deleteCar($validated, $id);
 
-        return response()->json(["deleted"=>$car, "status"=>"success"]);
+        return response()->json(['deleted' => $car, 'status' => 'success']);
 
     }
 
     /**
      * Download all as file
      */
-    public function download(string $type){
+    public function download(string $type)
+    {
         $accept = ['csv', 'json'];
-        $fname = "cars.".$type;
-        if(in_array($type, $accept)){
-            $export = new CarsExport();
-            if($type == "csv"){
+        $fname = 'cars.'.$type;
+        if (in_array($type, $accept)) {
+            $export = new CarsExport;
+            if ($type == 'csv') {
                 $content = $export->toCsv();
-                $content_type = "text/csv";
+                $content_type = 'text/csv';
+
                 return response()->streamDownload(function () use ($content) {
                     echo $content;
-                }, $fname, ['Content-Type'=>$content_type]);
+                }, $fname, ['Content-Type' => $content_type]);
                 // return Excel::download(new CarsExport, $fname);
-            }else{
+            } else {
                 $content = $export->toJson();
-                $content_type = "application/json";
+                $content_type = 'application/json';
+
                 return response()->streamDownload(function () use ($content) {
                     echo $content;
-                }, $fname, ['Content-Type'=>$content_type]);
+                }, $fname, ['Content-Type' => $content_type]);
             }
-        }else{
-            throw new RuntimeException("Unrecognized / Unacceptable File Type!!");
+        } else {
+            throw new RuntimeException('Unrecognized / Unacceptable File Type!!');
         }
     }
 }

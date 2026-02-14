@@ -5,7 +5,9 @@ namespace App\Dtos;
 class ConditionDto
 {
     private string $field;
+
     private string $ops;
+
     private string $value;
 
     public function __construct(array $param)
@@ -21,6 +23,7 @@ class ConditionDto
     public function setField(string $field): self
     {
         $this->field = $field;
+
         return $this;
     }
 
@@ -32,6 +35,7 @@ class ConditionDto
     public function setOps(string $ops): self
     {
         $this->ops = $ops;
+
         return $this;
     }
 
@@ -43,6 +47,7 @@ class ConditionDto
     public function setValue(string $value): self
     {
         $this->value = $value;
+
         return $this;
     }
 
@@ -52,8 +57,11 @@ class ConditionDto
             $this->setField($data['field']);
         }
         if (isset($data['ops'])) {
-            if($data['ops'] == "==")  $this->setOps("=");
-            else $this->setOps($data['ops']);
+            if ($data['ops'] == '==') {
+                $this->setOps('=');
+            } else {
+                $this->setOps($data['ops']);
+            }
         }
         if (isset($data['value'])) {
             $this->setValue($data['value']);

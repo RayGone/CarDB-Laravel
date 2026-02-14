@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Log;
-
-use App\Repositories\CarsRepository;
-use Illuminate\Http\Request;
 use App\Enums\CarsAttributeEnum;
 use App\Models\Cars;
+use App\Repositories\CarsRepository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 use function Pest\Laravel\json;
 
@@ -21,8 +20,8 @@ class ChartsController extends Controller
     //     $this->carsRepository = $carsRepository;
     // }
 
-
-    public function modelPerYear(Request $request){
+    public function modelPerYear(Request $request)
+    {
         // return response()->json([
         //         "status"=>"error",
         //         "message"=>"Server Error: ",
@@ -35,7 +34,6 @@ class ChartsController extends Controller
         $query = Cars::select(CarsAttributeEnum::MODEL_YEAR->value, CarsAttributeEnum::ORIGIN->value, DB::raw('count(*) as count'))
             ->groupBy(CarsAttributeEnum::MODEL_YEAR->value, CarsAttributeEnum::ORIGIN->value)->orderBy(CarsAttributeEnum::MODEL_YEAR->value);
 
-
         // $brand = strtolower($brand);
         // if(!(is_null($brand) || $brand==="all")){
         //     $c = CarsAttributeEnum::NAME->value;
@@ -44,34 +42,36 @@ class ChartsController extends Controller
         // }
 
         $data = $query->get();
+
         return $data;
     }
 
-    public function highLowAttributes(Request $request){
+    public function highLowAttributes(Request $request)
+    {
         $param = $request->all();
-        $direction = in_array("order", array_keys($param)) ? $param["order"]  : "desc";
+        $direction = in_array('order', array_keys($param)) ? $param['order'] : 'desc';
 
         $acceleration = Cars::select(CarsAttributeEnum::NAME->value, CarsAttributeEnum::ACCELERATION->value)
-                            ->orderBy(CarsAttributeEnum::ACCELERATION->value, $direction)->limit(10)
-                            ->whereNotNull(CarsAttributeEnum::ACCELERATION->value)->get();
+            ->orderBy(CarsAttributeEnum::ACCELERATION->value, $direction)->limit(10)
+            ->whereNotNull(CarsAttributeEnum::ACCELERATION->value)->get();
 
         $power = Cars::select(CarsAttributeEnum::NAME->value, CarsAttributeEnum::HORSEPOWER->value)
-                            ->orderBy(CarsAttributeEnum::HORSEPOWER->value, $direction)->limit(10)
-                            ->whereNotNull(CarsAttributeEnum::HORSEPOWER->value)->get();
+            ->orderBy(CarsAttributeEnum::HORSEPOWER->value, $direction)->limit(10)
+            ->whereNotNull(CarsAttributeEnum::HORSEPOWER->value)->get();
 
         $mileage = Cars::select(CarsAttributeEnum::NAME->value, CarsAttributeEnum::MPG->value)
-                            ->orderBy(CarsAttributeEnum::MPG->value, $direction)->limit(10)
-                            ->whereNotNull(CarsAttributeEnum::MPG->value)->get();
+            ->orderBy(CarsAttributeEnum::MPG->value, $direction)->limit(10)
+            ->whereNotNull(CarsAttributeEnum::MPG->value)->get();
 
         $engine = Cars::select(CarsAttributeEnum::CYLINDERS->value, DB::raw('count(*) as count'))
-                            ->groupBy(CarsAttributeEnum::CYLINDERS->value)
-                            ->whereNotNull(CarsAttributeEnum::CYLINDERS->value)->get();
+            ->groupBy(CarsAttributeEnum::CYLINDERS->value)
+            ->whereNotNull(CarsAttributeEnum::CYLINDERS->value)->get();
 
         return response()->json([
-            'acceleration'=>$acceleration,
+            'acceleration' => $acceleration,
             'power' => $power,
             'mileage' => $mileage,
-            'engine' => $engine
+            'engine' => $engine,
         ]);
     }
 

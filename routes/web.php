@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-// use Laravel\Fortify\Features;
 use App\Models\User;
+use Illuminate\Support\Facades\Route;
+// use Laravel\Fortify\Features;
+use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('auth/login', [
@@ -12,7 +12,7 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function(){
+Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
@@ -24,15 +24,15 @@ Route::middleware(['auth', 'verified'])->group(function(){
 
     Route::post('/apiToken', function () {
         $user = request()->user();
-        $token = "";
-        if($user){
+        $token = '';
+        if ($user) {
             $user = User::find($user['id']);
             $user->tokens()->delete();
             $token = $user->createToken('Access Token')->plainTextToken;
-        };
+        }
 
         return response()->json([
-            'apiToken' => $token
+            'apiToken' => $token,
         ]);
     })->name('getApiToken');
 });
