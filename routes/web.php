@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('auth/Login', [
+    return Inertia::render('auth/login', [
         // 'canRegister' => Features::enabled(Features::registration()),
         'canResetPassword' => false,
     ]);
@@ -15,7 +15,7 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('dashboard', function () {
-        return Inertia::render('Dashboard');
+        return Inertia::render('dashboard');
     })->name('dashboard');
 
     Route::get('charts', function () {
