@@ -54,8 +54,8 @@ jobs:
           php -r "file_exists('.env') || copy('.env.example', '.env');"
           php artisan key:generate
 
-      - name: Clear Caches
-        run: php artisan optimize:clear
+      # - name: Clear Caches
+      #   run: php artisan optimize:clear
 
       - name: Storage link
         run: php artisan storage:link --force
