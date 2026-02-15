@@ -59,7 +59,7 @@ function getBarChartData(data: ApiChartResponse[]) {
             ...row,
             total: Object.entries(row)
                 .filter((entry) => unique_origins.includes(entry[0]))
-                .reduce((acc, entry) => acc + (entry[1] as number), 0),
+                .reduce((acc, entry) => acc + parseInt(entry[1] as string), 0),
         }));
 
     return [unique_origins, chartData];
@@ -75,7 +75,7 @@ function getPieChartData(data: ApiChartResponse[]) {
         origin: origin,
         count: data
             .filter((row) => row['origin'] == origin)
-            .reduce((acc, row) => acc + row.count, 0),
+            .reduce((acc, row) => acc + parseInt(row.count+""), 0),
         fill: colors.next().value,
     }));
 
@@ -103,11 +103,11 @@ function* colorGenerator() {
     return '#afd847';
 }
 
-const ChartTitle: FC<PropsWithChildren> = ({ children }: PropsWithChildren) => (
+const ChartTitle: FC<PropsWithChildren> = ({ children }: PropsWithChildren) => (<>
     <div className="w-full self-center text-center text-2xl font-bold underline text-shadow-sm">
         {children}
     </div>
-);
+</>);
 
 export default () => {
     const modelCount = useFetchCarModelCountChartData();
@@ -378,6 +378,7 @@ export default () => {
                             <Pie
                                 data={attributeData['engine']?.map((row) => ({
                                     ...row,
+                                    count: parseInt(row['count'] as string),
                                     cylinders: `Cylinders(${row['cylinders']})`,
                                     fill: color.next().value,
                                 }))}
