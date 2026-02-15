@@ -34,6 +34,11 @@ jobs:
       - name: Install Node Dependencies
         run: npm i
 
+      - name: Directory Permissions
+        run: |
+          chmod -R 775 storage
+          chmod -R 775 public
+
       - name: Make Frontend Build
         run: npm run build
         env:
@@ -44,22 +49,16 @@ jobs:
           # VITE_PUSHER_SCHEME: ${{vars.PUSHER_SCHEME}}
           # VITE_PUSHER_APP_CLUSTER: ${{vars.PUSHER_APP_CLUSTER}}
 
-      - name: Directory Permissions
-        run: |
-          chmod -R 775 storage
-          chmod -R 775 public
-
-
       - name: Setup Environment Variables
         run: |
           php -r "file_exists('.env') || copy('.env.example', '.env');"
           php artisan key:generate
 
-      # - name: Clear Caches
-      #   run: php artisan optimize:clear
+      - name: Clear Caches
+        run: php artisan optimize:clear
 
-      # - name: Storage link
-      #   run: php artisan storage:link --force
+      - name: Storage link
+        run: php artisan storage:link --force
 
       - name: ZIP Vendor
         run: zip -r vendor.zip vendor
