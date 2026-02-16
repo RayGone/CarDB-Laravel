@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import axiosInstance from '@/bootstrap';
 import { getFilter, isInitFilter } from '@/model';
 
@@ -11,11 +11,11 @@ const emptyResponse = { cars: [], total: 0 };
 const useFetchTableData = () => {
     const [apiToken] = useFetchApiToken();
     const [cars, setCars] = useState<CarResponse>(emptyResponse);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, startDataFetchTransition] = useTransition();
     const [pageFilter, setPageFilter] = useState<DataFilterModel>(getFilter());
 
     const abortController = useRef<{ control: AbortController | null }>({
-        control: null,
+        control: new AbortController(),
     });
 
     useEffect(() => {
@@ -24,35 +24,25 @@ const useFetchTableData = () => {
             // return;
         }
 
-        if (abortController?.current?.control) {
+        if (abortController.current?.control) {
             abortController.current.control.abort();
         }
 
         abortController.current.control = new AbortController();
+        startDataFetchTransition(async () => {
+            const fetchData = await axiosInstance
+                .post(getbyfilter().url, pageFilter, {
+                    headers: {
+                        Authorization: `Bearer ${apiToken}`,
+                    },
+                    signal: abortController.current.control?.signal,
+                });
 
-        setTimeout(() => {
-            setLoading(true);
-        }, 50);
-
-        axiosInstance
-            .post(getbyfilter().url, pageFilter, {
-                headers: {
-                    Authorization: `Bearer ${apiToken}`,
-                },
-                signal: abortController.current.control.signal,
-            })
-            .then((res) => {
-                // console.log({res})
-                if (res.data.status == 'success') {
-                    const response: CarResponse = res.data.data;
+            if (fetchData.status == 200 && fetchData.data.status == 'success') {
+                    const response: CarResponse = fetchData.data.data;
                     setCars(response);
-                    setLoading(false);
                 }
-            })
-            .catch((err) => {
-                console.debug({ err });
-                setLoading(false);
-            });
+        });
     }, [apiToken, pageFilter]);
 
     return { cars, loading, pageFilter, setPageFilter };

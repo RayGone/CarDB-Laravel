@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import axiosInstance from '@/bootstrap';
 
 import { carAttributes } from '@/routes/api/charts';
@@ -9,10 +9,10 @@ const useFetchAttributeChartData = (order: 'asc' | 'desc' = 'desc') => {
     const [apiToken] = useFetchApiToken();
     const [attributeData, setData] = useState<Array<ApiChartResponse>>([]);
     const [valueOrder, setAttributeValueOrder] = useState<typeof order>(order);
-    const [attributeLoading, setLoading] = useState<boolean>(false);
+    const [attributeLoading, startAttributeFetchTransition] = useTransition();
 
     const abortController = useRef<{ control: AbortController | null }>({
-        control: null,
+        control: new AbortController(),
     });
 
     useEffect(() => {
@@ -22,37 +22,24 @@ const useFetchAttributeChartData = (order: 'asc' | 'desc' = 'desc') => {
 
         abortController.current.control = new AbortController();
 
-        setTimeout(() => {
-            setLoading(true);
-        }, 10);
+        startAttributeFetchTransition(async ()=>{
+            const fetchAttributeData = await axiosInstance
+                        .post(
+                            carAttributes().url,
+                            { order: valueOrder },
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${apiToken}`,
+                                },
+                                signal: abortController.current.control?.signal,
+                            },
+                        );
 
-        axiosInstance
-            .post(
-                carAttributes().url,
-                { order: valueOrder },
-                {
-                    headers: {
-                        Authorization: `Bearer ${apiToken}`,
-                    },
-                    signal: abortController.current.control.signal,
-                },
-            )
-            .then((res) => {
-                setTimeout(() => {
-                    setLoading(false);
-                }, 20);
-                // console.log({res})
-                if (res.status == 200) {
-                    const response: typeof attributeData = res.data;
-                    setData(response);
-                }
-            })
-            .catch((err) => {
-                console.log({ err });
-                setTimeout(() => {
-                    setLoading(false);
-                }, 20);
-            });
+            if (fetchAttributeData.status == 200) {
+                const response: typeof attributeData = fetchAttributeData.data;
+                setData(response);
+            }
+        });
     }, [apiToken, valueOrder]);
 
     return { attributeData, attributeLoading, setAttributeValueOrder };

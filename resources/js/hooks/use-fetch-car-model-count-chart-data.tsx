@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import axiosInstance from '@/bootstrap';
 
 import { countPerYear } from '@/routes/api/charts';
@@ -8,10 +8,10 @@ import { useFetchApiToken } from '.';
 const useFetchChartData = () => {
     const [apiToken] = useFetchApiToken();
     const [data, setData] = useState<Array<ApiChartResponse>>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, startDataFetchTransition] = useTransition();
 
     const abortController = useRef<{ control: AbortController | null }>({
-        control: null,
+        control: new AbortController(),
     });
 
     useEffect(() => {
@@ -21,37 +21,25 @@ const useFetchChartData = () => {
 
         abortController.current.control = new AbortController();
 
-        setTimeout(() => {
-            setLoading(true);
-        }, 10);
+        startDataFetchTransition(async ()=>{
+            const fetchData = await axiosInstance
+                        .post(
+                            countPerYear().url,
+                            {},
+                            {
+                                headers: {
+                                    Authorization: `Bearer ${apiToken}`,
+                                },
+                                signal: abortController.current.control?.signal,
+                            },
+                        );
 
-        axiosInstance
-            .post(
-                countPerYear().url,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${apiToken}`,
-                    },
-                    signal: abortController.current.control.signal,
-                },
-            )
-            .then((res) => {
-                // console.log({res})
-                if (res.status == 200) {
-                    const response: typeof data = res.data;
-                    setData(response);
-                }
-                setTimeout(() => {
-                    setLoading(false);
-                }, 20);
-            })
-            .catch((err) => {
-                console.log({ err });
-                setTimeout(() => {
-                    setLoading(false);
-                }, 20);
-            });
+
+            if (fetchData.status == 200) {
+                const response: typeof data = fetchData.data;
+                setData(response);
+            }
+        });
     }, [apiToken]);
 
     return { data, loading };
