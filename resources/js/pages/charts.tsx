@@ -109,20 +109,15 @@ const ChartTitle: FC<PropsWithChildren> = ({ children }: PropsWithChildren) => (
     </div>
 </>);
 
-export default () => {
+
+const ChartSection1: FC = () => {
+    const color = colorGenerator();
     const modelCount = useFetchCarModelCountChartData();
-    const { attributeData, attributeLoading, setAttributeValueOrder } =
-        useFetchCarAttributesChartData();
-    // console.log({attributeData, attributeLoading})
     const [origins, barChartData] = getBarChartData(modelCount.data);
     const pieChartData = getPieChartData(modelCount.data);
 
-    const color = colorGenerator();
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Charts" />
-
-            <div className="flex w-full flex-row flex-wrap justify-between gap-1">
+            <div className="flex w-full flex-row flex-wrap justify-between gap-1 mt-4">
                 <div className="col-span-1 flex min-h-[300px] w-full flex-col bg-gray-200 p-2 md:w-[49%] dark:bg-gray-800">
                     <ChartTitle>Number of New Models / Year</ChartTitle>
 
@@ -237,12 +232,17 @@ export default () => {
                     </ResponsiveContainer>
                 </div>
             </div>
+    );
+}
 
-            <br />
-            <hr />
-            <br />
 
-            <div className="flex w-full flex-row flex-wrap justify-between gap-1">
+const ChartSection2: FC = () => {
+    const color = colorGenerator();
+    const { attributeData, attributeLoading, setAttributeValueOrder } =
+        useFetchCarAttributesChartData();
+
+    return (
+            <div className="flex w-full flex-row flex-wrap justify-between gap-1 mt-4">
                 <ChartTitle>Car Attributes</ChartTitle>
                 <div className="flex w-full flex-row items-center justify-end gap-2 bg-background px-5 shadow-xs">
                     <label htmlFor="order" className="font-bold underline">
@@ -396,6 +396,20 @@ export default () => {
                     </ResponsiveContainer>
                 </div>
             </div>
+
+    );
+}
+
+export default () => {
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Charts" />
+
+            <ChartSection1 />
+
+            <br /><hr /><br />
+
+            <ChartSection2 />
         </AppLayout>
     );
 };

@@ -3,7 +3,7 @@ name: Deploy to GCloud Compute Enginge VM
 on:
   push:
     branches:
-      - main
+      - deploy_gcloud
 
 jobs:
   deploy:
@@ -30,13 +30,10 @@ jobs:
         with:
           node-version: '>=20.11.0'
 
-      - name: Install Node Depend
+      - name: Install Node Dependencies and Build front end
         run: |
-          npm install --force
-          npm install -D @types/ziggy-js
-
-      - name: Make Frontend Build
-        run: npm run build
+          npm ci
+          npm run build
 
       - name: 'Google Cloud Authentication With Service Account Key JSON'
         uses: 'google-github-actions/auth@v2'
