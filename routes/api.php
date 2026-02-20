@@ -5,6 +5,7 @@ use App\Http\Controllers\ChartsController;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,3 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     });
 })->namespace('Cars');
+
+Route::get("/test_cache", fn()=>
+    response()->json(Cache::get('charts:modelperyear'))
+);
