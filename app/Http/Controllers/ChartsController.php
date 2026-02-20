@@ -4,12 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Enums\CarsAttributeEnum;
 use App\Models\Cars;
-use App\Repositories\CarsRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
-use function Pest\Laravel\json;
 
 class ChartsController extends Controller
 {
@@ -31,17 +29,20 @@ class ChartsController extends Controller
         // $param = $request->all();
         // $brand = in_array("brand", array_keys($param)) ? $param["brand"]  : '';
 
-        $query = Cars::select(CarsAttributeEnum::MODEL_YEAR->value, CarsAttributeEnum::ORIGIN->value, DB::raw('count(*) as count'))
-            ->groupBy(CarsAttributeEnum::MODEL_YEAR->value, CarsAttributeEnum::ORIGIN->value)->orderBy(CarsAttributeEnum::MODEL_YEAR->value);
-
+        try{
+            $data = Cache::remember("charts:modelperyear", 86400, fn() => Cars::select(CarsAttributeEnum::MODEL_YEAR->value, CarsAttributeEnum::ORIGIN->value, DB::raw('count(*) as count'))
+                ->groupBy(CarsAttributeEnum::MODEL_YEAR->value, CarsAttributeEnum::ORIGIN->value)->orderBy(CarsAttributeEnum::MODEL_YEAR->value)->get());
+        }catch(\Exception $e){
+            Log::debug($e->getMessage());
+            $data =  Cars::select(CarsAttributeEnum::MODEL_YEAR->value, CarsAttributeEnum::ORIGIN->value, DB::raw('count(*) as count'))
+                ->groupBy(CarsAttributeEnum::MODEL_YEAR->value, CarsAttributeEnum::ORIGIN->value)->orderBy(CarsAttributeEnum::MODEL_YEAR->value)->get();
+        }
         // $brand = strtolower($brand);
         // if(!(is_null($brand) || $brand==="all")){
         //     $c = CarsAttributeEnum::NAME->value;
         //     Log::debug("Where Query Added", [$c, $brand]);
         //     $query = $query->whereRaw("LOWER($c) ILIKE ?", ["{$brand}%"]);
         // }
-
-        $data = $query->get();
 
         return $data;
     }
@@ -51,28 +52,41 @@ class ChartsController extends Controller
         $param = $request->all();
         $direction = in_array('order', array_keys($param)) ? $param['order'] : 'desc';
 
-        $acceleration = Cars::select(CarsAttributeEnum::NAME->value, CarsAttributeEnum::ACCELERATION->value)
-            ->orderBy(CarsAttributeEnum::ACCELERATION->value, $direction)->limit(10)
-            ->whereNotNull(CarsAttributeEnum::ACCELERATION->value)->get();
+        try{
+            $data = Cache::remember("charts:attributes:{$direction}", 86400, fn() => [
+                'acceleration' => Cars::select(CarsAttributeEnum::NAME->value, CarsAttributeEnum::ACCELERATION->value)
+                                        ->orderBy(CarsAttributeEnum::ACCELERATION->value, $direction)->limit(15)
+                                        ->whereNotNull(CarsAttributeEnum::ACCELERATION->value)->get(),
+                'power' => Cars::select(CarsAttributeEnum::NAME->value, CarsAttributeEnum::HORSEPOWER->value)
+                                    ->orderBy(CarsAttributeEnum::HORSEPOWER->value, $direction)->limit(15)
+                                    ->whereNotNull(CarsAttributeEnum::HORSEPOWER->value)->get(),
+                'mileage' => Cars::select(CarsAttributeEnum::NAME->value, CarsAttributeEnum::MPG->value)
+                                    ->orderBy(CarsAttributeEnum::MPG->value, $direction)->limit(15)
+                                    ->whereNotNull(CarsAttributeEnum::MPG->value)->get(),
+                'engine' => Cars::select(CarsAttributeEnum::CYLINDERS->value, DB::raw('count(*) as count'))
+                                    ->groupBy(CarsAttributeEnum::CYLINDERS->value)
+                                    ->whereNotNull(CarsAttributeEnum::CYLINDERS->value)->get(),
+            ]);
+        }catch(\Exception $e){
+            Log::debug($e->getMessage());
 
-        $power = Cars::select(CarsAttributeEnum::NAME->value, CarsAttributeEnum::HORSEPOWER->value)
-            ->orderBy(CarsAttributeEnum::HORSEPOWER->value, $direction)->limit(10)
-            ->whereNotNull(CarsAttributeEnum::HORSEPOWER->value)->get();
+            $data = [
+                'acceleration' => Cars::select(CarsAttributeEnum::NAME->value, CarsAttributeEnum::ACCELERATION->value)
+                                        ->orderBy(CarsAttributeEnum::ACCELERATION->value, $direction)->limit(15)
+                                        ->whereNotNull(CarsAttributeEnum::ACCELERATION->value)->get(),
+                'power' => Cars::select(CarsAttributeEnum::NAME->value, CarsAttributeEnum::HORSEPOWER->value)
+                                    ->orderBy(CarsAttributeEnum::HORSEPOWER->value, $direction)->limit(15)
+                                    ->whereNotNull(CarsAttributeEnum::HORSEPOWER->value)->get(),
+                'mileage' => Cars::select(CarsAttributeEnum::NAME->value, CarsAttributeEnum::MPG->value)
+                                    ->orderBy(CarsAttributeEnum::MPG->value, $direction)->limit(15)
+                                    ->whereNotNull(CarsAttributeEnum::MPG->value)->get(),
+                'engine' => Cars::select(CarsAttributeEnum::CYLINDERS->value, DB::raw('count(*) as count'))
+                                    ->groupBy(CarsAttributeEnum::CYLINDERS->value)
+                                    ->whereNotNull(CarsAttributeEnum::CYLINDERS->value)->get(),
+            ];
+        }
 
-        $mileage = Cars::select(CarsAttributeEnum::NAME->value, CarsAttributeEnum::MPG->value)
-            ->orderBy(CarsAttributeEnum::MPG->value, $direction)->limit(10)
-            ->whereNotNull(CarsAttributeEnum::MPG->value)->get();
-
-        $engine = Cars::select(CarsAttributeEnum::CYLINDERS->value, DB::raw('count(*) as count'))
-            ->groupBy(CarsAttributeEnum::CYLINDERS->value)
-            ->whereNotNull(CarsAttributeEnum::CYLINDERS->value)->get();
-
-        return response()->json([
-            'acceleration' => $acceleration,
-            'power' => $power,
-            'mileage' => $mileage,
-            'engine' => $engine,
-        ]);
+        return response()->json($data);
     }
 
     // public function countModelCylinderPerYear(Request $request){
